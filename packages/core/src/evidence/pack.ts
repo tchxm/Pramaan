@@ -4,9 +4,9 @@ import path from "node:path";
 import type { Audit, EvidencePack, TraceEvent } from "../types.js";
 import { canonicalJson } from "./canonical.js";
 import { verifyChain } from "./chain.js";
+import { DISCLAIMER } from "../constants.js";
 
-export const DISCLAIMER =
-  "Pramaan identifies technical patterns associated with deceptive interfaces, maps them to relevant regulatory guidance, and produces evidence supporting a self-audit. It does not provide legal certification.";
+export { DISCLAIMER };
 
 export interface BuildEvidencePackInput {
   audit: Audit;

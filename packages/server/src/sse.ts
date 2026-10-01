@@ -6,9 +6,14 @@ import type { AuditStore } from "./store.js";
 const HEARTBEAT_MS = 15_000;
 
 function writeEvent(reply: FastifyReply, event: TraceEvent): void {
+  // Send the FULL TraceEvent as data, not just payload — the frontend needs
+  // `actor` (engine/agent/human provenance, spec 18.6's core truthfulness
+  // claim) and `seq`/`ts`/hash fields for its trace strip and reconnect
+  // dedup logic. `id`/`event` are still set per SSE protocol for
+  // EventSource's native id tracking and addEventListener(type, ...).
   reply.raw.write(`id: ${event.seq}\n`);
   reply.raw.write(`event: ${event.type}\n`);
-  reply.raw.write(`data: ${JSON.stringify(event.payload)}\n\n`);
+  reply.raw.write(`data: ${JSON.stringify(event)}\n\n`);
 }
 
 function writeSnapshot(reply: FastifyReply, seq: number, payload: unknown): void {

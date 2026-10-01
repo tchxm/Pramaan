@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./constants": "./dist/constants.js"
   },
   "scripts": {
     "build": "tsc -b tsconfig.json && node -e \"require('fs').cpSync('src/regulation/data','dist/regulation/data',{recursive:true})\"",
