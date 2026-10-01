@@ -41,25 +41,193 @@
   margin: 0 0 24px;
 }
 
+/* ---------- S5 Verify ---------- */
+
+.scr-verify-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.scr-verify-intro .scr-headline {
+  margin-bottom: var(--space-3);
+}
+
+.scr-verify-intro .scr-subhead {
+  margin-bottom: 0;
+}
+
+@media (min-width: 900px) {
+  .scr-verify-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .scr-verify-intro {
+    flex: 0 0 340px;
+    position: sticky;
+    top: calc(var(--space-7) + 72px);
+  }
+  .scr-verify-layout > :last-child {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
 .scr-wordmark {
   font-weight: 600;
   font-size: 13px;
   color: var(--slate);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.scr-wordmark:hover {
+  color: var(--ink);
 }
 
 /* ---------- S1 Start ---------- */
 
-.scr-start-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  align-items: start;
+.scr-start-hero {
+  max-width: 640px;
+  margin: var(--space-6) 0 var(--space-7);
 }
 
-@media (min-width: 900px) {
-  .scr-start-grid {
-    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+.scr-start-eyebrow {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--tag);
+  margin: 0 0 var(--space-2);
+}
+
+.scr-start-lede {
+  color: var(--slate);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 56ch;
+}
+
+.scr-start-choices {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+@media (min-width: 820px) {
+  .scr-start-choices {
+    grid-template-columns: 1fr 1fr;
   }
+}
+
+.scr-start-card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.scr-start-card--featured {
+  border-color: var(--tag);
+  box-shadow: var(--glow);
+}
+
+.scr-start-card__label {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--slate);
+  margin: 0 0 var(--space-2);
+  letter-spacing: 0.06em;
+}
+
+.scr-start-card__title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 22px;
+  margin: 0 0 var(--space-2);
+  color: var(--ink);
+}
+
+.scr-start-card__dek {
+  color: var(--slate);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 var(--space-4);
+}
+
+.scr-path-input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--bench);
+  color: var(--ink);
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 13px;
+  margin-bottom: var(--space-2);
+}
+
+.scr-demo-name {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0 0 2px;
+}
+
+.scr-demo-facts {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--slate);
+}
+
+.scr-demo-facts li::before {
+  content: "— ";
+  color: var(--tag);
+}
+
+.scr-start-options {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: var(--space-5);
+  max-width: 420px;
+  margin-bottom: var(--space-5);
+}
+
+.scr-advanced {
+  margin-bottom: var(--space-6);
+}
+
+.scr-advanced > summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--slate);
+  padding: var(--space-2) 0;
+  user-select: none;
+}
+
+.scr-advanced > summary:hover {
+  color: var(--ink);
+}
+
+.scr-advanced[open] > summary {
+  margin-bottom: var(--space-3);
+  color: var(--ink);
+}
+
+.scr-advanced__start {
+  max-width: 220px;
 }
 
 .scr-panel {
@@ -235,7 +403,11 @@
   border-radius: 10px;
   box-shadow: var(--glow);
   pointer-events: auto;
-  transition: top 0.15s ease, left 0.15s ease;
+}
+
+.ws-tour__card--corner {
+  right: 20px;
+  bottom: 20px;
 }
 
 .ws-tour__step {
@@ -273,8 +445,15 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  height: 100%;
+  height: 100dvh;
   box-sizing: border-box;
+  /* Without this, content taller than the viewport (header + banners +
+     the three-pane grid's natural min-content) silently overflows the
+     100%-height box instead of being clipped — the page itself becomes
+     scrollable and the inner panes' own `overflow: auto` never engages,
+     which is why panels didn't fit the viewport and the demo tour card
+     could end up partially below the fold. */
+  overflow: hidden;
 }
 
 .scr-workspace-header {
@@ -313,6 +492,46 @@
   background: var(--diff-del);
   color: var(--violation);
   border: 1px solid rgba(255, 129, 131, 0.35);
+}
+
+.scr-banner--notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+.scr-banner--notice strong {
+  font-size: 13px;
+  color: var(--review);
+  letter-spacing: 0.02em;
+}
+
+.scr-banner--notice p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--slate);
+}
+
+.scr-banner__dismiss {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: 3px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.scr-banner__dismiss:hover {
+  border-color: var(--ink);
 }
 
 .scr-empty-state {

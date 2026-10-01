@@ -70,8 +70,6 @@ export default function DemoTour({ onFinish }: { onFinish: () => void }) {
 
   if (!rect) return null;
   const current = STEPS[step]!;
-  const cardTop = Math.min(window.innerHeight - 180, Math.max(12, rect.bottom + 12));
-  const cardLeft = Math.min(window.innerWidth - 340, Math.max(12, rect.left));
 
   return (
     <div className="ws-tour" role="dialog" aria-modal="false" aria-label="Guided demo">
@@ -79,7 +77,13 @@ export default function DemoTour({ onFinish }: { onFinish: () => void }) {
         className="ws-tour__ring"
         style={{ top: rect.top - 6, left: rect.left - 6, width: rect.width + 12, height: rect.height + 12 }}
       />
-      <div className="ws-tour__card" style={{ top: cardTop, left: cardLeft }}>
+      {/* Anchored to a fixed corner rather than positioned relative to the
+          target rect: on a dense three-pane workspace there's rarely a free
+          pocket of space directly adjacent to the highlighted pane (step 1's
+          card, placed right below the findings list, collided with the
+          trace strip underneath it) — a fixed corner never collides with
+          whatever else is on screen, at any viewport height. */}
+      <div className="ws-tour__card ws-tour__card--corner">
         <p className="ws-tour__step">
           Step {step + 1} / {STEPS.length}
         </p>

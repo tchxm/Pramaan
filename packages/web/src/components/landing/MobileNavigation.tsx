@@ -73,17 +73,18 @@ export default function MobileNavigation({ id, open, onClose, onNavigate }: Mobi
       aria-hidden={!open}
       className={`lp-mobile-nav${open ? " lp-mobile-nav--open" : ""}`}
     >
+      <button type="button" onClick={() => onNavigate("/audit")}>
+        Audit
+      </button>
       <button type="button" onClick={() => onNavigate("/how-it-works")}>
-        How it works
+        Method
       </button>
       <button type="button" onClick={() => onNavigate("/verify")}>
         Evidence
       </button>
-      {/* No docs site exists yet; scroll to the in-page explanation instead
-          of linking to a fabricated external URL. */}
-      <a href="#how-it-works" onClick={onClose}>
-        Documentation
-      </a>
+      <button type="button" onClick={() => onNavigate("/docs")}>
+        Docs
+      </button>
       <button type="button" className="lp-mobile-nav__cta" onClick={() => onNavigate("/audit")}>
         Start an audit
       </button>

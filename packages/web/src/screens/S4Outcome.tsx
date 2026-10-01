@@ -11,6 +11,7 @@ import { usePrefersReducedMotion } from "./useMediaQuery.js";
 import { OutcomeHero } from "../components/workspace/OutcomeHero.js";
 import { GateMatrix } from "../components/workspace/GateMatrix.js";
 import { ProofBlock } from "../components/workspace/ProofBlock.js";
+import AppShell from "../components/shell/AppShell.js";
 import "../styles/workspace.css";
 import "../styles/screens.css";
 
@@ -112,8 +113,8 @@ export default function S4Outcome(): JSX.Element {
 
   return (
     <div className="scr-page scr-outcome">
+      <AppShell status={isCompleted ? "EVIDENCE READY" : "AUDIT RUNNING"} />
       <header className="scr-outcome-header">
-        <span className="scr-wordmark">Pramaan</span>
         <span className="ws-mono scr-audit-id">{store.audit.auditId}</span>
         <span className="scr-project-name">{store.audit.projectName}</span>
       </header>

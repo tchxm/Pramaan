@@ -3,7 +3,7 @@
 // not make (diff fetch, file fetch, approval resolution) and composes the
 // twenty workspace components around the live `useAuditStore` state.
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useAuditStore } from "../state/store.js";
 import { getAuditDiff, getAuditFile, resolveApproval, ApiError } from "../api/client.js";
 import type { ApprovalDecision } from "../components/workspace/ApprovalDrawer.js";
@@ -342,7 +342,9 @@ export default function S2Workspace(): JSX.Element {
   return (
     <div className="scr-page scr-workspace">
       <header className="scr-workspace-header">
-        <span className="scr-wordmark">Pramaan</span>
+        <Link to="/" className="scr-wordmark">
+          Pramaan
+        </Link>
         <span className="ws-mono scr-audit-id">{audit?.auditId}</span>
         <span className="scr-project-name">{audit?.projectName}</span>
         <PhaseBar phase={store.phase} failed={phaseFailed} />
@@ -355,14 +357,32 @@ export default function S2Workspace(): JSX.Element {
 
       {connection === "reconnecting" ? (
         <div className="scr-banner scr-banner--warn" role="status">
-          Reconnecting to the server
+          Connection interrupted. Reconnecting to audit {auditId ?? ""}…
         </div>
       ) : null}
 
       {errorBanner ? (
-        <div className="scr-banner scr-banner--error">
-          <ErrorState code={errorBanner.code} message={errorBanner.message} action={{ label: "Dismiss", onClick: dismissError }} />
-        </div>
+        errorBanner.code === "E_LLM_UNAVAILABLE" ? (
+          // An unconfigured LLM provider is an infrastructure notice, not a
+          // domain-severity failure — deterministic detection is unaffected,
+          // so this must not use the same red "something is broken" visual
+          // language as a real verification failure (spec: errors must not
+          // dominate the product, and must not borrow danger styling for
+          // non-failures).
+          <div className="scr-banner scr-banner--notice" role="status">
+            <div>
+              <strong>Agent unavailable</strong>
+              <p>No LLM provider is configured. Deterministic detection is still available.</p>
+            </div>
+            <button type="button" className="scr-banner__dismiss" onClick={dismissError}>
+              Continue without agent
+            </button>
+          </div>
+        ) : (
+          <div className="scr-banner scr-banner--error">
+            <ErrorState code={errorBanner.code} message={errorBanner.message} action={{ label: "Dismiss", onClick: dismissError }} />
+          </div>
+        )
       ) : null}
 
       {showEmptyState ? (

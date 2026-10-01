@@ -2,24 +2,30 @@
   --font-heading: "Fraunces", Georgia, serif;
   --font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
 
-  /* Evidence-grade dark tokens. Same names the whole app already consumes —
-     only the values changed, so screens.css/workspace.css reskin for free.
+  /* Evidence-grade dark tokens — values aligned to the PRAMAAN_FINAL_3HR
+     rescue spec's color system (void/surface/paper/signal/...), kept under
+     the app's existing token NAMES so screens.css/workspace.css reskin for
+     free instead of needing every selector rewritten. Mapping:
+       --void -> --bench   --surface -> --panel   --surface-2 -> --panel-raised
+       --paper -> --ink    --muted -> --slate      --signal -> --tag
+       --success -> --verified   --danger -> --violation   --signal-soft -> --link
      Verdict colors (violation/verified/review) are tuned for >=4.5:1
      contrast against --bench and --panel on dark backgrounds. */
-  --bench: #08100e;
-  --panel: #0e1a17;
-  --panel-raised: #132621;
-  --ink: #eef6f2;
-  --slate: #93a8a0;
-  --rule: #1e3530;
-  --tag: #4ee6b8;
-  --violation: #ff8183;
-  --verified: #4ee6b8;
-  --review: #f1c35a;
-  --link: #5eead4;
-  --diff-add: rgba(78, 230, 184, 0.12);
-  --diff-del: rgba(255, 129, 131, 0.12);
-  --glow: 0 0 0 1px rgba(78, 230, 184, 0.18), 0 0 24px rgba(78, 230, 184, 0.08);
+  --bench: #08090b;
+  --panel: #0e1113;
+  --panel-raised: #151a1d;
+  --ink: #f2f1e9;
+  --slate: #858d8a;
+  --rule: #2a3133;
+  --tag: #57e6c0;
+  --violation: #f06c65;
+  --verified: #72dfa6;
+  --review: #e8b65c;
+  --link: #a8f3de;
+  --code-bg: #090c0e;
+  --diff-add: rgba(87, 230, 192, 0.12);
+  --diff-del: rgba(240, 108, 101, 0.12);
+  --glow: 0 0 0 1px rgba(87, 230, 192, 0.18), 0 0 24px rgba(87, 230, 192, 0.08);
 
   /* Spacing scale — none existed before; screens.css/workspace.css used
      hardcoded px throughout. New rules should prefer these. */

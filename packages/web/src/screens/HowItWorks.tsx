@@ -19,6 +19,7 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { DISCLAIMER } from "@pramaan/core/constants";
+import AppShell from "../components/shell/AppShell.js";
 import "../styles/landing.css";
 import "../styles/howitworks.css";
 
@@ -109,15 +110,7 @@ export default function HowItWorks(): JSX.Element {
 
   return (
     <div className="hiw-page">
-      <header className="hiw-topbar">
-        <Link to="/" aria-label="PRAMAAN home">
-          PRAMAAN<span aria-hidden="true">✦</span>
-        </Link>
-        <nav aria-label="Secondary" className="hiw-topbar-links">
-          <Link to="/audit">Start an audit</Link>
-          <Link to="/verify">Verify a pack</Link>
-        </nav>
-      </header>
+      <AppShell />
 
       <main className="hiw-container">
         <section className="hiw-hero">

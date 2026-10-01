@@ -1,7 +1,7 @@
 import "../../styles/landing.css";
 import BootGate from "./BootGate.js";
 import HeroGlobe from "./HeroGlobe.js";
-import TopNavigation from "./TopNavigation.js";
+import AppShell from "../shell/AppShell.js";
 import HeroIntro from "./HeroIntro.js";
 import HeroActions from "./HeroActions.js";
 
@@ -16,7 +16,7 @@ export default function LandingPage() {
       <BootGate />
       <HeroGlobe />
 
-      <TopNavigation />
+      <AppShell variant="transparent" />
 
       <section id="how-it-works" className="lp-hero">
         <div className="lp-hero__content">

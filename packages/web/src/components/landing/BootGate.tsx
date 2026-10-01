@@ -16,8 +16,31 @@ const BOOT_LINES = [
   "agent providers — Anthropic · Gemini · Groq",
 ];
 
+// Shown once per browser session, not once per mount — without this,
+// pressing Back to "/" (or any re-render of LandingPage) remounts
+// BootGate and replays the whole ceremony, which reads as a bug the
+// instant a judge taps Back after looking at the workspace.
+const SESSION_KEY = "pramaan:boot-shown";
+
+function alreadyShownThisSession(): boolean {
+  try {
+    return sessionStorage.getItem(SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markShown(): void {
+  try {
+    sessionStorage.setItem(SESSION_KEY, "1");
+  } catch {
+    // sessionStorage unavailable (private mode, etc.) — gate just replays;
+    // not worth failing the page over.
+  }
+}
+
 export default function BootGate() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => !alreadyShownThisSession());
   const [closing, setClosing] = useState(false);
   const [entering, setEntering] = useState(false);
   const [flash, setFlash] = useState(false);
@@ -27,6 +50,8 @@ export default function BootGate() {
   const reducedRef = useRef(false);
 
   useEffect(() => {
+    if (!open) return;
+    markShown();
     reducedRef.current =
       typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedRef.current) {

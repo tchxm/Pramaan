@@ -1,0 +1,138 @@
+/* Documentation page — reuses howitworks.css's editorial section rhythm
+   (hiw-*) and adds a sticky table-of-contents sidebar + code/rule/gate
+   list presentation specific to reference material. */
+
+.docs-layout {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.docs-toc {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-4) 0 0;
+}
+
+.docs-toc a {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+  color: var(--slate);
+  letter-spacing: 0.02em;
+  padding: 4px 0;
+  border-left: 2px solid transparent;
+  padding-left: var(--space-3);
+}
+
+.docs-toc a:hover {
+  color: var(--ink);
+  border-left-color: var(--rule);
+}
+
+.docs-main {
+  margin: 0;
+}
+
+.docs-code {
+  background: var(--code-bg, var(--bench));
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: var(--space-4);
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--slate);
+  overflow-x: auto;
+  margin: var(--space-4) 0;
+}
+
+.docs-rule-list,
+.docs-gate-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.docs-rule,
+.docs-gate {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.docs-rule__id,
+.docs-gate__id {
+  flex-shrink: 0;
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+  color: var(--tag);
+  min-width: 48px;
+}
+
+.docs-rule strong,
+.docs-gate strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.docs-rule p,
+.docs-gate p {
+  margin: 4px 0 0;
+  color: var(--slate);
+  font-size: 13px;
+}
+
+.docs-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: var(--space-4) 0 0;
+  list-style: none;
+}
+
+.docs-chip {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--slate);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 4px 8px;
+}
+
+.docs-limits {
+  color: var(--slate);
+  font-size: 14px;
+  line-height: 1.6;
+  padding-left: var(--space-5);
+}
+
+.docs-limits li {
+  margin-bottom: var(--space-2);
+}
+
+@media (min-width: 1100px) {
+  .docs-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+  .docs-toc {
+    display: flex;
+    position: sticky;
+    top: 96px;
+    flex: 0 0 200px;
+  }
+  .docs-main {
+    flex: 1;
+    min-width: 0;
+  }
+}

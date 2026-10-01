@@ -1,0 +1,98 @@
+/* Shared app shell header — one nav treatment for every non-workspace
+   route. Reuses .lp-brand / .lp-pill / .lp-hamburger from landing.css so
+   the brand mark and CTA button are pixel-identical everywhere. */
+
+.shell-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--bench);
+  border-bottom: 1px solid var(--rule);
+}
+
+.shell-nav--transparent {
+  position: fixed;
+  inset-inline: 0;
+  background: linear-gradient(to bottom, rgba(8, 16, 14, 0.85), transparent);
+  border-bottom: none;
+}
+
+.shell-nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.shell-nav__links {
+  display: none;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-base);
+  color: var(--slate);
+}
+
+.shell-nav__links a {
+  color: inherit;
+  transition: color 0.15s ease;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+
+.shell-nav__links a:hover {
+  color: var(--ink);
+}
+
+.shell-nav__links a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--tag);
+}
+
+.shell-nav__right {
+  display: none;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.shell-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--slate);
+  white-space: nowrap;
+}
+
+.shell-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--slate);
+}
+
+.shell-status[data-tone="active"] {
+  color: var(--tag);
+}
+.shell-status[data-tone="active"] .shell-status__dot {
+  background: var(--tag);
+  box-shadow: 0 0 6px rgba(78, 230, 184, 0.6);
+}
+
+.shell-status[data-tone="warn"] {
+  color: var(--review);
+}
+.shell-status[data-tone="warn"] .shell-status__dot {
+  background: var(--review);
+}
+
+@media (min-width: 768px) {
+  .shell-nav__links,
+  .shell-nav__right {
+    display: flex;
+  }
+}
