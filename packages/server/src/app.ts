@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { AuditStore } from "./store.js";
 import { registerErrorHandler } from "./errorHandler.js";
 import { registerHealthRoute } from "./routes/health.js";
@@ -35,6 +35,9 @@ export async function buildApp(options: BuildAppOptions = {}) {
 }
 
 async function main() {
+  // npm workspace scripts run from packages/server. Fixtures, audit storage,
+  // and relative project paths must use the same repository root as root demo.
+  process.chdir(fileURLToPath(new URL("../../..", import.meta.url)));
   const app = await buildApp();
   const port = Number(process.env.PORT ?? 8787);
   await app.listen({ port, host: "0.0.0.0" });

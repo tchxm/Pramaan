@@ -219,8 +219,11 @@ npm run demo`}</pre>
             <p className="hiw-section-dek">
               <code>npm run demo</code> builds the core engine and server, starts the API, waits for
               it to report healthy, then starts the web app. The fastest path through the product is{" "}
-              <Link to="/audit?fixture=f06-mitti-mart&tour=1">Watch the demo</Link> from the home
-              page, which selects the Mitti Mart fixture and starts a guided walkthrough automatically.
+              <Link to="/demo">Watch the demo</Link>: a saved Mitti Mart walkthrough with real findings,
+              a patch, and engine results. It works without the live API. Its live-run link starts
+              a new fixture audit. “Run guided demo audit” uses a scripted sequence through the real
+              engine: one complete fix, one proposal-only stop, and two stops without proposals.
+              Live-agent mode remains a separate choice.
             </p>
           </section>
 

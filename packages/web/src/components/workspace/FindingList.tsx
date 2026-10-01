@@ -6,6 +6,7 @@ export interface FindingListProps {
   findings: Finding[];
   selectedId?: string;
   onSelect: (id: string) => void;
+  progressLabels?: Record<string, string>;
 }
 
 // Severity reuses existing tokens rather than inventing new colors (spec
@@ -22,7 +23,7 @@ const SEVERITY_LABEL: Record<Severity, string> = {
  * identical rounded cards"). Each row shows title, rule id, severity and
  * a StatusPill so the verdict is always visible alongside the claim.
  */
-export function FindingList({ findings, selectedId, onSelect }: FindingListProps): JSX.Element {
+export function FindingList({ findings, selectedId, onSelect, progressLabels }: FindingListProps): JSX.Element {
   if (findings.length === 0) {
     return (
       <p className="ws-finding-list__empty">
@@ -53,6 +54,7 @@ export function FindingList({ findings, selectedId, onSelect }: FindingListProps
               </span>
               <StatusPill status={f.status} />
             </span>
+            {progressLabels?.[f.findingId] && <span className="ws-finding-row__progress">{progressLabels[f.findingId]}</span>}
           </button>
         );
       })}

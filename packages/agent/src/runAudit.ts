@@ -39,6 +39,8 @@ export interface RunAuditOptions {
 }
 
 export interface RunAuditIO {
+  /** Engine-owned progress snapshot, available before the LLM finishes. */
+  onAuditUpdate?(audit: Audit): void;
   emit(event: TraceEvent): void;
   requestApproval(request: ApprovalRequest): Promise<void>;
   onApprovalResolved(approvalId: string): Promise<ApprovalRequest>;
@@ -94,8 +96,15 @@ export async function runAudit(options: RunAuditOptions, io: RunAuditIO): Promis
   for (const f of scannedFindings) findings.set(f.findingId, f);
 
   const before = severityCounts(scannedFindings);
+  io.onAuditUpdate?.({ auditId: options.auditId, projectName: path.basename(options.projectRoot),
+    startedAt, engineVersion: ENGINE_VERSION, configHash: config.configHash,
+    filesScanned: workspace.files.size, before, findings: scannedFindings, status: "running" });
 
-  const trace = new TraceEmitter((event) => io.emit(event));
+  let readAudit: (() => Audit) | undefined;
+  const trace = new TraceEmitter((event) => {
+    if (readAudit) io.onAuditUpdate?.(readAudit());
+    io.emit(event);
+  });
   trace.emit({ type: "audit.started", actor: "engine", payload: { auditId: options.auditId, projectRoot: options.projectRoot, mode: options.mode ?? "live" } });
   trace.emit({
     type: "scan.completed",
@@ -152,14 +161,14 @@ export async function runAudit(options: RunAuditOptions, io: RunAuditIO): Promis
   const llmClient = options.llmClient ?? createDefaultLLMClient();
   const llmInfo = {
     provider:
-      process.env.LLM_API_KEY || process.env.ANTHROPIC_API_KEY
+      options.mode === "replay" ? "replay" : process.env.LLM_API_KEY || process.env.ANTHROPIC_API_KEY
         ? "anthropic"
         : process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
           ? "gemini"
           : process.env.GROQ_API_KEY
             ? "groq"
             : "none",
-    model: process.env.PRAMAAN_MODEL ?? "unknown",
+    model: options.mode === "replay" ? "scripted-tool-sequence" : process.env.PRAMAAN_MODEL ?? "unknown",
     temperature: 0,
     mode: (options.mode ?? "live") as "live" | "replay",
   };
@@ -228,6 +237,9 @@ export async function runAudit(options: RunAuditOptions, io: RunAuditIO): Promis
     injectionNotes,
     buildAudit,
   };
+
+  readAudit = () => buildAudit("running");
+  io.onAuditUpdate?.(readAudit());
 
   // Spec 19 adversarial-failure list: zero findings at all -> agent never
   // started, audit completes immediately with an (empty) evidence pack.

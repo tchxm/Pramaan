@@ -13,3 +13,10 @@ coverage/
 test-results/
 playwright-report/
 *.tsbuildinfo
+
+# Internal planning/prompt docs and design-reference scratch — not for the
+# public repo or judges; keep locally only.
+/PRAMAAN_*PROMPT*.md
+/ui-reference/
+/packages/web/qa/
+.qodo/

@@ -50,6 +50,15 @@ export default function BootGate() {
   const reducedRef = useRef(false);
 
   useEffect(() => {
+    const replay = () => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      setLines([]); setReady(false); setClosing(false); setEntering(false); setFlash(false); setOpen(true);
+    };
+    window.addEventListener("pramaan:replay-intro", replay);
+    return () => window.removeEventListener("pramaan:replay-intro", replay);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
     markShown();
     reducedRef.current =
@@ -64,13 +73,13 @@ export default function BootGate() {
         window.setTimeout(() => {
           setLines((prev) => [...prev, line]);
           if (i === BOOT_LINES.length - 1) {
-            window.setTimeout(() => setReady(true), 200);
+            setReady(true);
           }
         }, 220 * (i + 1)),
       );
     });
     return () => timers.forEach(window.clearTimeout);
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (ready) buttonRef.current?.focus();

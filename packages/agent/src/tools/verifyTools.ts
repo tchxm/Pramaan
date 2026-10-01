@@ -5,7 +5,8 @@
 // and it only does so by reading the real VerifyResult the engine returns.
 
 import { z } from "zod";
-import { ok, fail, zodIssues, verifyFinding, buildEvidencePack, writeReportBundle } from "@pramaan/core";
+import { ok, fail, zodIssues, verifyFinding, buildEvidencePack, writeReportBundle, hashFile } from "@pramaan/core";
+import path from "node:path";
 import type { Result } from "@pramaan/core";
 import type { AgentToolContext } from "./context.js";
 
@@ -125,8 +126,7 @@ export async function evidenceGenerateHandler(_input: unknown, ctx: AgentToolCon
   const files: { path: string; sha256Before: string; sha256After: string }[] = [];
   for (const rel of ctx.workspace.files.keys()) {
     const before = ctx.workspace.files.get(rel)?.sha256 ?? "";
-    const after = before; // workspace.files is the pre-scan snapshot; a full
-    // post-patch re-hash is a nice-to-have left for a future pass (see KNOWN RISKS).
+    const after = await hashFile(path.join(ctx.workspace.root, rel));
     files.push({ path: rel, sha256Before: before, sha256After: after });
   }
 

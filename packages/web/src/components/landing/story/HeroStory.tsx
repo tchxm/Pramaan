@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { createStoryScene, type StoryScene } from "./storyScene.js";
 import HeroIntro from "../HeroIntro.js";
 import HeroActions from "../HeroActions.js";
+import StaticSignal from "../StaticSignal.js";
+import SoundControl from "../SoundControl.js";
 import "../../../styles/story.css";
 
 /**
@@ -48,10 +50,10 @@ const EVIDENCE_STEPS = [
 // [fadeInStart, fullStart, fullEnd, fadeOutEnd] in 0-1 scroll progress.
 const BEAT_RANGES: [number, number, number, number][] = [
   [-1, -1, 0.03, 0.15],
-  [0.08, 0.2, 0.32, 0.4],
-  [0.3, 0.4, 0.56, 0.66],
-  [0.58, 0.66, 0.8, 0.88],
-  [0.8, 0.88, 1.02, 1.02],
+  [0.15, 0.2, 0.30, 0.35],
+  [0.35, 0.43, 0.56, 0.60],
+  [0.60, 0.66, 0.80, 0.84],
+  [0.84, 0.90, 1.02, 1.02],
 ];
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
@@ -75,7 +77,7 @@ export default function HeroStory() {
   useEffect(() => {
     function evaluate() {
       const reducedMotion = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const narrow = window.innerWidth < 860 || window.innerHeight < 560;
+      const narrow = window.innerWidth < 768 || window.innerHeight < 560;
       setSimple(reducedMotion || narrow);
     }
     evaluate();
@@ -115,7 +117,16 @@ export default function HeroStory() {
       const total = rect.height - window.innerHeight;
       const progress = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
 
-      scene!.update(progress, pointer.x, pointer.y, dt);
+      // CRT and incoming copy share boundaries, in both scroll directions.
+      // Update the texture before rendering so it cannot lag by one frame.
+      if (progress < BEAT_RANGES[2]![0]) scene!.setScreenText({ header: "PRAMAAN / AUDIT ENGINE", action: "READY", sub: "observing" });
+      else if (progress < BEAT_RANGES[3]![0]) scene!.setScreenText({ header: "DEMO / PRM-002", action: "INVESTIGATING", sub: "agent investigation" });
+      else if (progress < BEAT_RANGES[4]![0]) scene!.setScreenText({ header: "DEMO / ENGINE CHECK", action: "G1 \u2192 G5", sub: "the engine decides" });
+      else scene!.setScreenText({ header: "DEMO / EVIDENCE", action: "RECORDED", sub: "proof, not promises" });
+
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        scene!.update(progress, pointer.x, pointer.y, dt);
+      }
 
       for (let i = 0; i < BEAT_RANGES.length; i++) {
         const op = beatOpacity(progress, BEAT_RANGES[i]!);
@@ -128,10 +139,6 @@ export default function HeroStory() {
       }
       if (hintRef.current) hintRef.current.style.opacity = String(1 - smoothstep(0, 0.06, progress));
 
-      if (progress < 0.28) scene!.setScreenText({ header: "PRAMAAN / AUDIT ENGINE", action: "READY", sub: "observing" });
-      else if (progress < 0.56) scene!.setScreenText({ header: "PRM-002 / FALSE URGENCY", action: "INVESTIGATING", sub: "tool 04 / 17" });
-      else if (progress < 0.8) scene!.setScreenText({ header: "ENGINE CHECK", action: "G1 → G5", sub: "verifying" });
-      else scene!.setScreenText({ header: "EVIDENCE", action: "RECORDED", sub: "sha-256 chained" });
 
       raf = requestAnimationFrame(tick);
     }
@@ -162,6 +169,8 @@ export default function HeroStory() {
         <section className="story__simple-beat story__simple-beat--1">
           <HeroIntro />
           <HeroActions />
+          <StaticSignal />
+          <SoundControl />
         </section>
         <section className="story__simple-beat">
           <p className="story__eyebrow">First, evidence.</p>
@@ -218,6 +227,7 @@ export default function HeroStory() {
     <div className="story" ref={sectionRef}>
       <div className="story__stage">
         <div className="story__canvas-mount" ref={mountRef} />
+        <SoundControl />
 
         <div className="story__beat story__beat--1" ref={beatRefs[0]}>
           <div className="story__beat-inner">

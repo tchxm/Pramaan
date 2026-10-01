@@ -147,9 +147,22 @@ export const useAuditStore = create<AuditStoreState>((set, get) => ({
         const patch: Partial<AuditStoreState> = { events, phase };
 
         switch (event.type) {
+          case "tool.result": {
+            if (event.payload.name !== "patch.propose") break;
+            const result = event.payload.result as { ok?: boolean; data?: PatchProposal };
+            const proposal = result?.data;
+            if (result?.ok && proposal?.findingId) {
+              patch.phase = "fix";
+              const existing = state.proposalsByFinding[proposal.findingId] ?? [];
+              if (!existing.some(p => p.proposalId === proposal.proposalId)) {
+                patch.proposalsByFinding = { ...state.proposalsByFinding, [proposal.findingId]: [...existing, proposal] };
+              }
+            }
+            break;
+          }
           case "patch.applied": {
-            const payload = event.payload as { findingId?: string };
-            if (payload.findingId) {
+            const payload = event.payload as { findingId?: string; result?: { applied?: boolean } };
+            if (payload.findingId && payload.result?.applied) {
               const existing = state.findingsById[payload.findingId];
               if (existing) {
                 patch.findingsById = {
@@ -167,7 +180,7 @@ export const useAuditStore = create<AuditStoreState>((set, get) => ({
           case "verify.result": {
             // RULE: finding status changes ONLY here, from the structured
             // verdict — never from agent.reason text (I-01).
-            const payload = event.payload as unknown as VerifyResult;
+            const payload = (event.payload.result ?? event.payload) as unknown as VerifyResult;
             const findingId = payload.findingId;
             if (findingId) {
               patch.verifyByFinding = { ...state.verifyByFinding, [findingId]: payload };

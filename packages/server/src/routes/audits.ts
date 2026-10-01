@@ -30,6 +30,7 @@ const createAuditSchema = z.object({
   source: sourceSchema,
   options: z
     .object({
+      demoScenario: z.literal("mixed-outcomes").optional(),
       runtime: z.boolean().optional(),
       maxAttempts: z.number().int().min(1).max(5).optional(),
       autoApprovePreview: z.boolean().optional(),
@@ -81,6 +82,10 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
       return;
     }
     const { source, options } = parsed.data;
+    if (options?.demoScenario && (source.type !== "fixture" || source.id !== "f06-mitti-mart")) {
+      sendError(reply, "E_BAD_INPUT", "The scripted demo is available only for the Mitti Mart fixture.");
+      return;
+    }
 
     let sourceRoot: string;
     try {
@@ -263,10 +268,10 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
         regulationDataVersion: "india-1",
       },
       llm: {
-        provider: "anthropic",
-        model: process.env.LLM_MODEL ?? "unset",
+        provider: record.options.demoScenario ? "replay" : "anthropic",
+        model: record.options.demoScenario ? "scripted-tool-sequence" : process.env.LLM_MODEL ?? "unset",
         temperature: 0,
-        mode: (process.env.PRAMAAN_AGENT_MODE as "live" | "replay") ?? "live",
+        mode: record.options.demoScenario ? "replay" : (process.env.PRAMAAN_AGENT_MODE as "live" | "replay") ?? "live",
       },
       config: {},
       files: [],
@@ -292,16 +297,27 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
     });
   }
 
+  async function completedPack(record: ReturnType<typeof requireAudit>): Promise<EvidencePack> {
+    const event = [...record.trace].reverse().find(e => e.type === "evidence.generated");
+    if (record.audit.completedAt && record.audit.evidenceHash && typeof event?.payload.packPath === "string") {
+      const packPath = await resolveConfinedPath(event.payload.packPath, [path.join(record.sourceRoot, "pramaan-report")]);
+      const pack = JSON.parse(await readFile(packPath, "utf-8")) as EvidencePack;
+      if (pack.evidenceHash !== record.audit.evidenceHash) throw err("E_STATE_CONFLICT", "The recorded evidence hash does not match the generated pack.");
+      return pack;
+    }
+    return buildPackForRecord(record);
+  }
+
   app.get("/api/audits/:id/evidence", async (request, reply) => {
     const { id } = request.params as { id: string };
     const record = requireAudit(store, id);
-    return buildPackForRecord(record);
+    return completedPack(record);
   });
 
   app.get("/api/audits/:id/report", async (request, reply) => {
     const { id } = request.params as { id: string };
     const record = requireAudit(store, id);
-    const pack = buildPackForRecord(record);
+    const pack = await completedPack(record);
     reply.type("text/html");
     return renderReportHtml(pack, record.trace);
   });

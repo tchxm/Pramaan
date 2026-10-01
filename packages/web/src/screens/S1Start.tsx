@@ -6,7 +6,7 @@
 // other fixture is still reachable, just under "Advanced demo scenarios"
 // rather than presented as the primary onboarding surface.
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   getFixtures,
   createAudit,
@@ -48,6 +48,12 @@ export default function S1Start(): JSX.Element {
   const requestedFixture = searchParams.get("fixture");
   const tour = searchParams.get("tour") === "1";
   const autoStartedRef = useRef(false);
+  const mountedRef = useRef(true);
+  const pendingRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const load = (): void => {
     setLoadState("loading");
@@ -71,15 +77,20 @@ export default function S1Start(): JSX.Element {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(load, []);
 
-  const startFixture = (fixtureId: string, useTour: boolean): void => {
-    if (starting) return;
+  const startFixture = (fixtureId: string, useTour: boolean, scripted = false): void => {
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     setStarting(true);
     setStartError(null);
-    createAudit({ type: "fixture", id: fixtureId }, { runtime, maxAttempts, autoApprovePreview })
+    createAudit({ type: "fixture", id: fixtureId }, { runtime, maxAttempts, autoApprovePreview, demoScenario: scripted ? "mixed-outcomes" : undefined })
       .then(({ auditId }) => {
-        navigate(useTour ? `/audit/${auditId}?tour=1` : `/audit/${auditId}`);
+        if (!mountedRef.current) return;
+        // Consume the auto-launch URL so Back cannot launch another audit.
+        navigate(useTour ? `/audit/${auditId}?tour=1` : `/audit/${auditId}`, { replace: tour });
       })
       .catch((err: unknown) => {
+        if (!mountedRef.current) return;
+        pendingRef.current = false;
         const message = err instanceof ApiError ? err.message : "Could not start the audit.";
         setStartError(message);
         setStarting(false);
@@ -87,19 +98,22 @@ export default function S1Start(): JSX.Element {
   };
 
   const startPath = (): void => {
-    if (!projectPath.trim() || starting) return;
+    if (!projectPath.trim() || pendingRef.current) return;
+    pendingRef.current = true;
     setStarting(true);
     setStartError(null);
     createAudit({ type: "path", path: projectPath.trim() }, { runtime, maxAttempts, autoApprovePreview })
-      .then(({ auditId }) => navigate(`/audit/${auditId}`))
+      .then(({ auditId }) => { if (mountedRef.current) navigate(`/audit/${auditId}`); })
       .catch((err: unknown) => {
+        if (!mountedRef.current) return;
+        pendingRef.current = false;
         const message = err instanceof ApiError ? err.message : "Could not start the audit.";
         setStartError(message);
         setStarting(false);
       });
   };
 
-  // "Watch the demo" (?tour=1&fixture=f06-mitti-mart) auto-starts once
+  // The saved walkthrough's live-run link (?tour=1&fixture=f06-mitti-mart) starts once
   // fixtures are loaded, so a judge sees the real workspace immediately.
   useEffect(() => {
     if (!tour || autoStartedRef.current) return;
@@ -107,7 +121,7 @@ export default function S1Start(): JSX.Element {
     const fixtureId = requestedFixture ?? FEATURED_FIXTURE_ID;
     if (!fixtures.some((f) => f.id === fixtureId)) return;
     autoStartedRef.current = true;
-    startFixture(fixtureId, true);
+    startFixture(fixtureId, true, searchParams.get("demo") === "mixed");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tour, loadState, fixtures, requestedFixture]);
 
@@ -115,6 +129,7 @@ export default function S1Start(): JSX.Element {
     return (
       <div className="scr-page scr-page--center">
         <AppShell />
+        <div className="scr-start-hero"><h1 className="scr-headline">Explore the saved demo.</h1><p className="scr-start-lede">The live audit service is offline. The saved example still shows what PRAMAAN finds, the patch it generated, and the actual engine checks.</p><Link className="scr-primary-btn" to="/demo">Open saved demo →</Link><Link to="/">Back to home</Link></div>
         <ErrorState
           code={error.code}
           message={
@@ -142,6 +157,7 @@ export default function S1Start(): JSX.Element {
           It will detect deceptive patterns, investigate, propose bounded fixes, and verify every
           change with the same deterministic engine that found the problem.
         </p>
+        <Link to="/demo">See the saved example before starting →</Link>
       </header>
 
       <div className="scr-start-choices">
@@ -185,18 +201,19 @@ export default function S1Start(): JSX.Element {
           ) : (
             <>
               <p className="scr-demo-name">Mitti Mart</p>
-              <p className="scr-start-card__dek">Full PRAMAAN demonstration</p>
+              {!featured && <p className="scr-inline-error">The API has no Mitti Mart fixture available. <Link to="/demo">Open the saved example</Link> or restart the local demo service from the project root.</p>}
+              <p className="scr-start-card__dek">A scripted run through the real engine: protection goes through fix, verification, and evidence; the countdown stops after a proposal; two other findings stop for human review with no proposal. No model API key is needed.</p>
               <ul className="scr-demo-facts">
                 <li>{featured ? findingCount(featured) : 4} deterministic findings</li>
-                <li>agent remediation</li>
-                <li>G1–G5 verification</li>
+                <li>1 complete fix · 1 proposal-only stop · 2 review-only stops</li>
+                <li>actual G1–G5 verification for the complete path</li>
                 <li>evidence pack</li>
               </ul>
               <button
                 type="button"
                 className="scr-primary-btn"
-                disabled={starting || loadState !== "ready"}
-                onClick={() => startFixture(FEATURED_FIXTURE_ID, true)}
+                disabled={starting || loadState !== "ready" || !featured}
+                onClick={() => startFixture(FEATURED_FIXTURE_ID, true, true)}
               >
                 {starting ? "Starting audit…" : "Run demo audit →"}
               </button>

@@ -14,6 +14,7 @@ const S4Outcome = lazy(() => import("./screens/S4Outcome.js"));
 const S5Verify = lazy(() => import("./screens/S5Verify.js"));
 const HowItWorks = lazy(() => import("./screens/HowItWorks.js"));
 const DocsPage = lazy(() => import("./screens/DocsPage.js"));
+const SavedDemo = lazy(() => import("./screens/SavedDemo.js"));
 
 // A deep link to an unknown route must not silently dump the user at Home
 // (spec P0) — react-router renders nothing at all for an unmatched path
@@ -55,8 +56,11 @@ function RouteFallback() {
 function RouteTransition({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const previousPath = useRef(location.pathname);
 
   useEffect(() => {
+    if (previousPath.current !== location.pathname) window.scrollTo(0, 0);
+    previousPath.current = location.pathname;
     const container = containerRef.current;
     if (!container) return;
     // Lazy routes commit their real <h1> only after the Suspense fallback
@@ -90,10 +94,23 @@ function RouteTransition({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    // Best effort only: browsers can intercept these shortcuts before JS.
+    // Replay intro is the reliable control; ordinary reload keeps the session.
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "r") ||
+          (event.key === "F5" && (event.ctrlKey || event.shiftKey))) {
+        try { sessionStorage.removeItem("pramaan:boot-shown"); } catch { /* storage unavailable */ }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
   return (
     <RouteTransition>
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/demo" element={<Suspense fallback={<RouteFallback />}><SavedDemo /></Suspense>} />
       <Route
         path="/audit"
         element={

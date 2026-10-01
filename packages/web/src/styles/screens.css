@@ -458,6 +458,7 @@
 
 .scr-workspace-header {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
@@ -542,6 +543,7 @@
 
 .scr-three-pane {
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   grid-template-columns: 280px minmax(0, 1fr) 360px;
   gap: 12px;
   flex: 1;
@@ -550,6 +552,7 @@
 
 .scr-two-pane {
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   grid-template-columns: 280px minmax(0, 1fr);
   gap: 12px;
   flex: 1;
@@ -561,6 +564,8 @@
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  min-height: 0;
+  overflow: auto;
 }
 
 .scr-right-toggle {
@@ -574,7 +579,15 @@
   flex-direction: column;
   gap: 8px;
   min-width: 0;
+  min-height: 0;
+  flex: 1;
 }
+
+.scr-narrow > .scr-left-pane,
+.scr-narrow > .scr-center-pane,
+.scr-narrow > .scr-right-pane { flex: 1; }
+
+.scr-workspace > .scr-banner { flex-shrink: 0; }
 
 .scr-left-pane,
 .scr-center-pane,
@@ -584,6 +597,7 @@
   border-radius: 10px;
   padding: 14px;
   min-width: 0;
+  min-height: 0;
   overflow: auto;
 }
 

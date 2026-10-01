@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuditStore } from "../state/store.js";
-import { applyAudit, getEvidencePack, reportUrl, ApiError } from "../api/client.js";
+import { applyAudit, getEvidencePack, reportUrl, evidenceUrl, ApiError } from "../api/client.js";
 import { usePrefersReducedMotion } from "./useMediaQuery.js";
 import { OutcomeHero } from "../components/workspace/OutcomeHero.js";
 import { GateMatrix } from "../components/workspace/GateMatrix.js";
@@ -24,7 +24,7 @@ export default function S4Outcome(): JSX.Element {
     if (!id) return;
     // Reuse an already-connected stream for the same audit (e.g. navigating
     // here from S2); only reconnect on a fresh navigation or reload.
-    if (useAuditStore.getState().auditId !== id) {
+    if (useAuditStore.getState().auditId !== id || useAuditStore.getState().connection === "closed") {
       useAuditStore.getState().connect(id);
     }
     return () => {
@@ -129,7 +129,7 @@ export default function S4Outcome(): JSX.Element {
           evidenceHash={store.audit.evidenceHash ?? ""}
           traceHead={traceHead}
           reportUrl={reportUrl(id)}
-          packUrl={reportUrl(id)}
+          packUrl={evidenceUrl(id)}
         />
       ) : null}
 

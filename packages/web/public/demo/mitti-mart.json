@@ -1,0 +1,849 @@
+{
+  "kind": "recorded-engine-example",
+  "project": "Mitti Mart",
+  "fixture": "f06-mitti-mart",
+  "description": "Recorded deterministic scan and one engine-generated fix. No live agent session is represented.",
+  "recordedAt": "2026-10-01T12:58:12.332Z",
+  "findings": [
+    {
+      "findingId": "F-PRM-002-1",
+      "ruleId": "PRM-002",
+      "pattern": "FALSE_URGENCY",
+      "severity": "high",
+      "status": "open",
+      "detector": "AST",
+      "location": {
+        "file": "src/pages/Cart.tsx",
+        "startLine": 25,
+        "startColumn": 4,
+        "endLine": 51,
+        "endColumn": 10
+      },
+      "fingerprint": "09791e6b2a4cc54b2b99e6a58e05452b73cba03736d6c57f23a7ff7e877d6d0c",
+      "title": "Countdown timer creates false urgency",
+      "evidence": {
+        "sourceSnippet": "\n  return (\n    <div className=\"page\">\n      <h1>Your basket</h1>\n      <p>Organic Coffee — ₹799</p>\n      <p>Offer expires in {mm}:{ss}</p>\n\n      <label>\n        <input\n          type=\"checkbox\"\n          checked={protection}\n          onChange={(e) => setProtection(e.target.checked)}",
+        "fileSha256": "29dba9c25de948ce7f2b196396e80b150898b289186fa77b3416e8e9e937be67",
+        "observed": {
+          "seedGetter": "secondsLeft",
+          "seedValue": 120,
+          "urgencyText": "expire"
+        },
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S_COUNTDOWN_STRUCTURE",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "seed": 120,
+            "setter": "setSecondsLeft"
+          }
+        },
+        {
+          "id": "S_URGENCY_TEXT_MATCH",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "match": "expire"
+          }
+        }
+      ],
+      "score": null,
+      "requiresReview": false,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: False urgency",
+          "patternName": "False urgency",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Creating a sense of urgency or scarcity that is not genuine, such as fake countdown timers, is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    },
+    {
+      "findingId": "F-PRM-001-1",
+      "ruleId": "PRM-001",
+      "pattern": "BASKET_SNEAKING",
+      "severity": "high",
+      "status": "open",
+      "detector": "AST",
+      "location": {
+        "file": "src/pages/Cart.tsx",
+        "startLine": 31,
+        "startColumn": 8,
+        "endLine": 35,
+        "endColumn": 10
+      },
+      "fingerprint": "98e96ae917bc17e3d2095adcead1f32481111ef37fd0a8f427dbc415a6dd89c5",
+      "title": "Checkbox pre-selected in a commercial context",
+      "evidence": {
+        "sourceSnippet": "\n      <label>\n        <input\n          type=\"checkbox\"\n          checked={protection}\n          onChange={(e) => setProtection(e.target.checked)}\n        />\n        {\" \"}Delivery Protection — ₹{FEES.protection}\n      </label>\n\n      <div>\n        <button className=\"cta-yes\" type=\"button\" onClick={() => setProtection(true)}>",
+        "fileSha256": "29dba9c25de948ce7f2b196396e80b150898b289186fa77b3416e8e9e937be67",
+        "observed": {
+          "label": "Delivery Protection — ₹",
+          "labelMethod": "enclosing_label",
+          "defaultSelectedMethod": "checked_state_getter_true"
+        },
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S_DEFAULT_SELECTED",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "method": "checked_state_getter_true"
+          }
+        },
+        {
+          "id": "S_COMMERCIAL_CURRENCY",
+          "fired": false,
+          "weight": 0,
+          "observed": {
+            "text": "Delivery Protection — ₹ Delivery Protection — ₹"
+          }
+        },
+        {
+          "id": "S_COMMERCIAL_KEYWORD",
+          "fired": true,
+          "weight": 0,
+          "observed": {
+            "text": "Delivery Protection — ₹ Delivery Protection — ₹"
+          }
+        }
+      ],
+      "score": null,
+      "requiresReview": false,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Basket sneaking",
+          "patternName": "Basket sneaking",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Adding paid items, add-ons, or subscriptions to a cart or order by default, without the consumer's affirmative action, is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    },
+    {
+      "findingId": "F-PRM-003-1",
+      "ruleId": "PRM-003",
+      "pattern": "INTERFACE_INTERFERENCE",
+      "severity": "high",
+      "status": "open",
+      "detector": "CSS_CASCADE",
+      "location": {
+        "file": "src/pages/Cart.tsx",
+        "startLine": 43,
+        "startColumn": 8,
+        "endLine": 45,
+        "endColumn": 17
+      },
+      "fingerprint": "dfda755bd1a559bc5023a147d843705626c392f572122cd7c36e5824a89cac99",
+      "title": "Potential interface interference",
+      "evidence": {
+        "sourceSnippet": "          Yes, protect my order\n        </button>\n        <button className=\"decline\" type=\"button\" onClick={() => setProtection(false)}>\n          No thanks\n        </button>\n      </div>\n\n      <button type=\"button\" onClick={proceed}>\n        Proceed to payment\n      </button>\n    </div>\n  );",
+        "fileSha256": "29dba9c25de948ce7f2b196396e80b150898b289186fa77b3416e8e9e937be67",
+        "observed": {
+          "acceptText": "Yes, protect my order",
+          "rejectText": "No thanks",
+          "score": 1,
+          "accept": "{\"fontPx\":18,\"fontWeight\":700,\"contrast\":6.607087170045344,\"opacity\":1,\"hidden\":false}",
+          "reject": "{\"fontPx\":10,\"fontWeight\":400,\"contrast\":2.185070422345483,\"opacity\":0.45,\"hidden\":false}"
+        },
+        "cascade": [
+          {
+            "property": "color",
+            "value": "#999999",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "opacity",
+            "value": "0.45",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-size",
+            "value": "10px",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-weight",
+            "value": "400",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "background",
+            "value": "transparent",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "color",
+            "value": "#ffffff",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-size",
+            "value": "18px",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-weight",
+            "value": "700",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "background",
+            "value": "#0b6b3a",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          }
+        ],
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S1_CONTRAST_GAP",
+          "fired": true,
+          "weight": 0.3,
+          "observed": {
+            "acceptContrast": 6.607087170045344,
+            "rejectContrast": 2.185070422345483
+          }
+        },
+        {
+          "id": "S2_SIZE_RATIO",
+          "fired": true,
+          "weight": 0.25,
+          "observed": {
+            "acceptFontPx": 18,
+            "rejectFontPx": 10
+          }
+        },
+        {
+          "id": "S3_OPACITY",
+          "fired": true,
+          "weight": 0.25,
+          "observed": {
+            "acceptOpacity": 1,
+            "rejectOpacity": 0.45
+          }
+        },
+        {
+          "id": "S4_WEIGHT_GAP",
+          "fired": true,
+          "weight": 0.1,
+          "observed": {
+            "acceptWeight": 700,
+            "rejectWeight": 400
+          }
+        },
+        {
+          "id": "S5_LOW_ABSOLUTE_SIZE",
+          "fired": true,
+          "weight": 0.1,
+          "observed": {
+            "rejectFontPx": 10
+          }
+        },
+        {
+          "id": "H_HIDDEN",
+          "fired": false,
+          "weight": 0,
+          "observed": {
+            "hidden": false,
+            "scoreOverride": null
+          }
+        }
+      ],
+      "score": 1,
+      "requiresReview": true,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Interface interference",
+          "patternName": "Interface interference",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Visually obscuring, de-emphasising, or otherwise making it harder for a consumer to find or exercise a choice they are entitled to make is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    },
+    {
+      "findingId": "F-PRM-004-1",
+      "ruleId": "PRM-004",
+      "pattern": "DRIP_PRICING",
+      "severity": "high",
+      "status": "open",
+      "detector": "PRICE_FLOW",
+      "location": {
+        "file": "src/pages/Payment.tsx",
+        "startLine": 16,
+        "startColumn": 8,
+        "endLine": 16,
+        "endColumn": 42
+      },
+      "fingerprint": "bc0eae575140fb6fdb1f3f2918df63892d00f0557016cb7ea7e8e4c592f14385",
+      "title": "Mandatory fee disclosed only at the last checkout step",
+      "evidence": {
+        "sourceSnippet": "        <li>Product ₹{product}</li>\n        {hasProtection && <li>Protection ₹{FEES.protection}</li>}\n        <li>Handling ₹{FEES.handling}</li>\n      </ul>\n      <p>TOTAL ₹{total}</p>\n    </div>\n  );\n}\n",
+        "fileSha256": "d5288885cf1d8dd4e9737e45d34daf6c313c3472b928811f7c39029ab028ef1a",
+        "observed": {
+          "firstVisibleStep": "payment",
+          "initialDisplayedPrice": 799,
+          "finalTotal": 39,
+          "undisclosedAmount": 39,
+          "feeComponents": "[{\"label\":\"Handling\",\"amount\":39,\"mandatory\":true}]"
+        },
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S_MANDATORY_FEE_UNDISCLOSED_EARLY",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "label": "Handling",
+            "amount": 39
+          }
+        }
+      ],
+      "score": null,
+      "requiresReview": false,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Drip pricing",
+          "patternName": "Drip pricing",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Not disclosing mandatory, non-optional charges to the consumer in advance, and revealing them only at a later stage of the checkout flow, is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    }
+  ],
+  "remainingFindings": [
+    {
+      "findingId": "F-PRM-002-1",
+      "ruleId": "PRM-002",
+      "pattern": "FALSE_URGENCY",
+      "severity": "high",
+      "status": "open",
+      "detector": "AST",
+      "location": {
+        "file": "src/pages/Cart.tsx",
+        "startLine": 25,
+        "startColumn": 4,
+        "endLine": 51,
+        "endColumn": 10
+      },
+      "fingerprint": "09791e6b2a4cc54b2b99e6a58e05452b73cba03736d6c57f23a7ff7e877d6d0c",
+      "title": "Countdown timer creates false urgency",
+      "evidence": {
+        "sourceSnippet": "\n  return (\n    <div className=\"page\">\n      <h1>Your basket</h1>\n      <p>Organic Coffee — ₹799</p>\n      <p>Offer expires in {mm}:{ss}</p>\n\n      <label>\n        <input\n          type=\"checkbox\"\n          checked={protection}\n          onChange={(e) => setProtection(e.target.checked)}",
+        "fileSha256": "bf6321bcbf74cc6e07e3d00de21b796a4e8534427d98912de71d7b20357479b2",
+        "observed": {
+          "seedGetter": "secondsLeft",
+          "seedValue": 120,
+          "urgencyText": "expire"
+        },
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S_COUNTDOWN_STRUCTURE",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "seed": 120,
+            "setter": "setSecondsLeft"
+          }
+        },
+        {
+          "id": "S_URGENCY_TEXT_MATCH",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "match": "expire"
+          }
+        }
+      ],
+      "score": null,
+      "requiresReview": false,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: False urgency",
+          "patternName": "False urgency",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Creating a sense of urgency or scarcity that is not genuine, such as fake countdown timers, is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    },
+    {
+      "findingId": "F-PRM-003-1",
+      "ruleId": "PRM-003",
+      "pattern": "INTERFACE_INTERFERENCE",
+      "severity": "high",
+      "status": "open",
+      "detector": "CSS_CASCADE",
+      "location": {
+        "file": "src/pages/Cart.tsx",
+        "startLine": 43,
+        "startColumn": 8,
+        "endLine": 45,
+        "endColumn": 17
+      },
+      "fingerprint": "dfda755bd1a559bc5023a147d843705626c392f572122cd7c36e5824a89cac99",
+      "title": "Potential interface interference",
+      "evidence": {
+        "sourceSnippet": "          Yes, protect my order\n        </button>\n        <button className=\"decline\" type=\"button\" onClick={() => setProtection(false)}>\n          No thanks\n        </button>\n      </div>\n\n      <button type=\"button\" onClick={proceed}>\n        Proceed to payment\n      </button>\n    </div>\n  );",
+        "fileSha256": "bf6321bcbf74cc6e07e3d00de21b796a4e8534427d98912de71d7b20357479b2",
+        "observed": {
+          "acceptText": "Yes, protect my order",
+          "rejectText": "No thanks",
+          "score": 1,
+          "accept": "{\"fontPx\":18,\"fontWeight\":700,\"contrast\":6.607087170045344,\"opacity\":1,\"hidden\":false}",
+          "reject": "{\"fontPx\":10,\"fontWeight\":400,\"contrast\":2.185070422345483,\"opacity\":0.45,\"hidden\":false}"
+        },
+        "cascade": [
+          {
+            "property": "color",
+            "value": "#999999",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "opacity",
+            "value": "0.45",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-size",
+            "value": "10px",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-weight",
+            "value": "400",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "background",
+            "value": "transparent",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".decline",
+            "line": 4,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "color",
+            "value": "#ffffff",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-size",
+            "value": "18px",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "font-weight",
+            "value": "700",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          },
+          {
+            "property": "background",
+            "value": "#0b6b3a",
+            "important": false,
+            "file": "src/styles.css",
+            "selector": ".cta-yes",
+            "line": 3,
+            "specificity": [
+              0,
+              1,
+              0
+            ],
+            "origin": "stylesheet",
+            "winner": true
+          }
+        ],
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S1_CONTRAST_GAP",
+          "fired": true,
+          "weight": 0.3,
+          "observed": {
+            "acceptContrast": 6.607087170045344,
+            "rejectContrast": 2.185070422345483
+          }
+        },
+        {
+          "id": "S2_SIZE_RATIO",
+          "fired": true,
+          "weight": 0.25,
+          "observed": {
+            "acceptFontPx": 18,
+            "rejectFontPx": 10
+          }
+        },
+        {
+          "id": "S3_OPACITY",
+          "fired": true,
+          "weight": 0.25,
+          "observed": {
+            "acceptOpacity": 1,
+            "rejectOpacity": 0.45
+          }
+        },
+        {
+          "id": "S4_WEIGHT_GAP",
+          "fired": true,
+          "weight": 0.1,
+          "observed": {
+            "acceptWeight": 700,
+            "rejectWeight": 400
+          }
+        },
+        {
+          "id": "S5_LOW_ABSOLUTE_SIZE",
+          "fired": true,
+          "weight": 0.1,
+          "observed": {
+            "rejectFontPx": 10
+          }
+        },
+        {
+          "id": "H_HIDDEN",
+          "fired": false,
+          "weight": 0,
+          "observed": {
+            "hidden": false,
+            "scoreOverride": null
+          }
+        }
+      ],
+      "score": 1,
+      "requiresReview": true,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Interface interference",
+          "patternName": "Interface interference",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Visually obscuring, de-emphasising, or otherwise making it harder for a consumer to find or exercise a choice they are entitled to make is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    },
+    {
+      "findingId": "F-PRM-004-1",
+      "ruleId": "PRM-004",
+      "pattern": "DRIP_PRICING",
+      "severity": "high",
+      "status": "open",
+      "detector": "PRICE_FLOW",
+      "location": {
+        "file": "src/pages/Payment.tsx",
+        "startLine": 16,
+        "startColumn": 8,
+        "endLine": 16,
+        "endColumn": 42
+      },
+      "fingerprint": "bc0eae575140fb6fdb1f3f2918df63892d00f0557016cb7ea7e8e4c592f14385",
+      "title": "Mandatory fee disclosed only at the last checkout step",
+      "evidence": {
+        "sourceSnippet": "        <li>Product ₹{product}</li>\n        {hasProtection && <li>Protection ₹{FEES.protection}</li>}\n        <li>Handling ₹{FEES.handling}</li>\n      </ul>\n      <p>TOTAL ₹{total}</p>\n    </div>\n  );\n}\n",
+        "fileSha256": "d5288885cf1d8dd4e9737e45d34daf6c313c3472b928811f7c39029ab028ef1a",
+        "observed": {
+          "firstVisibleStep": "payment",
+          "initialDisplayedPrice": 799,
+          "finalTotal": 39,
+          "undisclosedAmount": 39,
+          "feeComponents": "[{\"label\":\"Handling\",\"amount\":39,\"mandatory\":true}]"
+        },
+        "warnings": []
+      },
+      "signals": [
+        {
+          "id": "S_MANDATORY_FEE_UNDISCLOSED_EARLY",
+          "fired": true,
+          "weight": 1,
+          "observed": {
+            "label": "Handling",
+            "amount": 39
+          }
+        }
+      ],
+      "score": null,
+      "requiresReview": false,
+      "regulation": [
+        {
+          "jurisdiction": "IN",
+          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Drip pricing",
+          "patternName": "Drip pricing",
+          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "plainBasis": "Not disclosing mandatory, non-optional charges to the consumer in advance, and revealing them only at a later stage of the checkout flow, is listed as a prohibited dark pattern.",
+          "verifiedAgainstGazette": false
+        }
+      ],
+      "attempts": 0
+    }
+  ],
+  "source": {
+    "file": "src/pages/Cart.tsx",
+    "before": "import { useEffect, useState } from \"react\";\nimport { useNavigate } from \"react-router-dom\";\nimport { FEES } from \"../constants/fees\";\n\nexport default function Cart() {\n  const [protection, setProtection] = useState(true);\n  const [secondsLeft, setSecondsLeft] = useState(120);\n  const navigate = useNavigate();\n\n  useEffect(() => {\n    const id = setInterval(() => {\n      setSecondsLeft((s) => Math.max(0, s - 1));\n    }, 1000);\n    return () => clearInterval(id);\n  }, []);\n\n  const mm = String(Math.floor(secondsLeft / 60)).padStart(2, \"0\");\n  const ss = String(secondsLeft % 60).padStart(2, \"0\");\n\n  function proceed() {\n    navigate(`/payment?protection=${protection ? 1 : 0}`);\n  }\n\n  return (\n    <div className=\"page\">\n      <h1>Your basket</h1>\n      <p>Organic Coffee — ₹799</p>\n      <p>Offer expires in {mm}:{ss}</p>\n\n      <label>\n        <input\n          type=\"checkbox\"\n          checked={protection}\n          onChange={(e) => setProtection(e.target.checked)}\n        />\n        {\" \"}Delivery Protection — ₹{FEES.protection}\n      </label>\n\n      <div>\n        <button className=\"cta-yes\" type=\"button\" onClick={() => setProtection(true)}>\n          Yes, protect my order\n        </button>\n        <button className=\"decline\" type=\"button\" onClick={() => setProtection(false)}>\n          No thanks\n        </button>\n      </div>\n\n      <button type=\"button\" onClick={proceed}>\n        Proceed to payment\n      </button>\n    </div>\n  );\n}\n",
+    "after": "import { useEffect, useState } from \"react\";\nimport { useNavigate } from \"react-router-dom\";\nimport { FEES } from \"../constants/fees\";\n\nexport default function Cart() {\n  const [protection, setProtection] = useState(false);\n  const [secondsLeft, setSecondsLeft] = useState(120);\n  const navigate = useNavigate();\n\n  useEffect(() => {\n    const id = setInterval(() => {\n      setSecondsLeft((s) => Math.max(0, s - 1));\n    }, 1000);\n    return () => clearInterval(id);\n  }, []);\n\n  const mm = String(Math.floor(secondsLeft / 60)).padStart(2, \"0\");\n  const ss = String(secondsLeft % 60).padStart(2, \"0\");\n\n  function proceed() {\n    navigate(`/payment?protection=${protection ? 1 : 0}`);\n  }\n\n  return (\n    <div className=\"page\">\n      <h1>Your basket</h1>\n      <p>Organic Coffee — ₹799</p>\n      <p>Offer expires in {mm}:{ss}</p>\n\n      <label>\n        <input\n          type=\"checkbox\"\n          checked={protection}\n          onChange={(e) => setProtection(e.target.checked)}\n        />\n        {\" \"}Delivery Protection — ₹{FEES.protection}\n      </label>\n\n      <div>\n        <button className=\"cta-yes\" type=\"button\" onClick={() => setProtection(true)}>\n          Yes, protect my order\n        </button>\n        <button className=\"decline\" type=\"button\" onClick={() => setProtection(false)}>\n          No thanks\n        </button>\n      </div>\n\n      <button type=\"button\" onClick={proceed}>\n        Proceed to payment\n      </button>\n    </div>\n  );\n}\n",
+    "beforeSha256": "29dba9c25de948ce7f2b196396e80b150898b289186fa77b3416e8e9e937be67",
+    "afterSha256": "bf6321bcbf74cc6e07e3d00de21b796a4e8534427d98912de71d7b20357479b2"
+  },
+  "proposal": {
+    "proposalId": "pp-70fd430d-7f7e-4ad1-8a58-b00bb154a6a3",
+    "findingId": "F-PRM-001-1",
+    "strategy": "checkbox.default_off",
+    "rationale": "Engine-generated proposal for strategy \"checkbox.default_off\" against finding F-PRM-001-1 (1 op).",
+    "ops": [
+      {
+        "opId": "op-set_initial_state_literal-a3b7745a",
+        "kind": "SET_INITIAL_STATE_LITERAL",
+        "file": "src/pages/Cart.tsx",
+        "target": {
+          "fingerprint": "98e96ae917bc17e3d2095adcead1f32481111ef37fd0a8f427dbc415a6dd89c5",
+          "line": 6
+        },
+        "params": {
+          "stateName": "protection",
+          "from": true,
+          "to": false
+        }
+      }
+    ],
+    "risk": "deterministic",
+    "requiresApproval": false
+  },
+  "patch": {
+    "proposalId": "pp-70fd430d-7f7e-4ad1-8a58-b00bb154a6a3",
+    "applied": true,
+    "filesChanged": [
+      "src/pages/Cart.tsx"
+    ],
+    "diff": "Index: src/pages/Cart.tsx\n===================================================================\n--- src/pages/Cart.tsx\tbefore\n+++ src/pages/Cart.tsx\tafter\n@@ -2,9 +2,9 @@\n import { useNavigate } from \"react-router-dom\";\n import { FEES } from \"../constants/fees\";\n \n export default function Cart() {\n-  const [protection, setProtection] = useState(true);\n+  const [protection, setProtection] = useState(false);\n   const [secondsLeft, setSecondsLeft] = useState(120);\n   const navigate = useNavigate();\n \n   useEffect(() => {\n",
+    "policyViolations": []
+  },
+  "verification": {
+    "findingId": "F-PRM-001-1",
+    "fingerprint": "98e96ae917bc17e3d2095adcead1f32481111ef37fd0a8f427dbc415a6dd89c5",
+    "verdict": "VERIFIED",
+    "gates": [
+      {
+        "gate": "G1_DETECTOR_CLEAR",
+        "status": "pass",
+        "details": {}
+      },
+      {
+        "gate": "G2_PRESERVATION",
+        "status": "pass",
+        "details": {}
+      },
+      {
+        "gate": "G3_BUILD",
+        "status": "pass",
+        "details": {}
+      },
+      {
+        "gate": "G4_RUNTIME",
+        "status": "pass",
+        "details": {
+          "observed": {
+            "labelText": "Delivery Protection — ₹",
+            "checked": false
+          }
+        }
+      },
+      {
+        "gate": "G5_NO_REGRESSION",
+        "status": "pass",
+        "details": {}
+      }
+    ],
+    "failureReasons": [],
+    "engineVersion": "0.1.0",
+    "verifiedAt": "2026-10-01T12:58:12.332Z"
+  }
+}

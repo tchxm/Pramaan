@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const COPY_TEXT = "npx pramaan audit ./src";
@@ -14,28 +14,14 @@ function CopyIcon() {
 
 /**
  * Hero action pills. Every pill routes somewhere real via react-router's
- * useNavigate — none are dead buttons. "Watch the demo" uses a query-param
- * convention on /audit (?fixture=f06-mitti-mart auto-selects fixture F06).
+ * useNavigate. "Watch the demo" opens the saved /demo walkthrough; its
+ * live-run link consumes the /audit launch URL after starting a fixture.
  * "See how verification works" goes to the real /how-it-works#verification
  * deep section.
  */
 export default function HeroActions() {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    const prefersReducedMotion =
-      typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (prefersReducedMotion) {
-      setVisible(true);
-      return;
-    }
-
-    const timer = window.setTimeout(() => setVisible(true), 400);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   async function handleCopy() {
     try {
@@ -52,13 +38,17 @@ export default function HeroActions() {
   }
 
   return (
-    <div className={`lp-actions${visible ? " lp-actions--visible" : ""}`}>
+    <div className="lp-actions lp-actions--visible">
       <button type="button" onClick={() => navigate("/audit")} className="lp-pill lp-pill--primary">
         Start an audit
       </button>
 
-      <button type="button" onClick={() => navigate("/audit?fixture=f06-mitti-mart&tour=1")} className="lp-pill">
+      <button type="button" onClick={() => navigate("/demo")} className="lp-pill">
         Watch the demo
+      </button>
+
+      <button type="button" onClick={() => window.dispatchEvent(new Event("pramaan:replay-intro"))} className="lp-pill lp-pill--ghost">
+        Replay intro
       </button>
 
       <button type="button" onClick={() => navigate("/how-it-works#verification")} className="lp-pill">

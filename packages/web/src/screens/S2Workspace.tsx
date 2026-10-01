@@ -25,6 +25,7 @@ import { TraceStrip } from "../components/workspace/TraceStrip.js";
 import { TraceDetail } from "../components/workspace/TraceDetail.js";
 import { ApprovalDrawer } from "../components/workspace/ApprovalDrawer.js";
 import DemoTour from "../components/workspace/DemoTour.js";
+import FindingJourney, { findingProgressLabel } from "../components/workspace/FindingJourney.js";
 import { useBreakpoint } from "./useMediaQuery.js";
 
 import "../styles/workspace.css";
@@ -70,6 +71,9 @@ export default function S2Workspace(): JSX.Element {
   const selectedVerify = selectedFindingId ? verifyByFinding[selectedFindingId] : undefined;
   const selectedProposals = selectedFindingId ? (proposalsByFinding[selectedFindingId] ?? []) : [];
   const latestProposal = selectedProposals[selectedProposals.length - 1];
+  const evidenceReady = events.some(e => e.type === "evidence.generated");
+  const scriptedDemo = events.some(e => e.type === "audit.started" && e.payload.mode === "replay");
+  const progressLabels = Object.fromEntries(findings.map(f => [f.findingId, findingProgressLabel(f, !!proposalsByFinding[f.findingId]?.length, verifyByFinding[f.findingId], evidenceReady)]));
 
   const fileTreeFiles: FileTreeFile[] = useMemo(() => {
     const byFile = new Map<string, string[]>();
@@ -239,6 +243,7 @@ export default function S2Workspace(): JSX.Element {
         <p className="scr-empty-hint">Select a finding to inspect it.</p>
       ) : (
         <>
+          <FindingJourney finding={selectedFinding} hasProposal={!!latestProposal} verify={selectedVerify} events={events} />
           {centerView === "code" &&
             (codeLoading ? (
               <div className="scr-skeleton-row" />
@@ -323,7 +328,8 @@ export default function S2Workspace(): JSX.Element {
       {leftTab === "files" ? (
         <FileTree files={fileTreeFiles} selected={selectedFile ?? undefined} onSelect={onSelectFile} />
       ) : (
-        <FindingList findings={findings} selectedId={selectedFindingId ?? undefined} onSelect={selectFinding} />
+        !events.some(event => event.type === "scan.completed") ? <p className="scr-empty-hint" role="status">Scanning React source… findings will appear here.</p> :
+        <FindingList findings={findings} selectedId={selectedFindingId ?? undefined} onSelect={selectFinding} progressLabels={progressLabels} />
       )}
     </div>
   );
@@ -353,7 +359,10 @@ export default function S2Workspace(): JSX.Element {
             <StatusPill status={selectedFinding.status} />
           </div>
         ) : null}
+        {evidenceReady && id && <Link className="scr-secondary-btn" to={`/audit/${id}/outcome`}>Open outcome &amp; evidence →</Link>}
       </header>
+
+      {scriptedDemo && <div className="scr-banner scr-banner--notice" role="status"><div><strong>Scripted demo · actual engine execution.</strong><p>Protection: full fix → verify → evidence. Countdown: stop at proposal. Unequal choices and fee disclosure: review only, no proposals. Select a finding to see its progress.</p></div></div>}
 
       {connection === "reconnecting" ? (
         <div className="scr-banner scr-banner--warn" role="status">

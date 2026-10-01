@@ -95,6 +95,7 @@ export function getFixtures(): Promise<FixtureSummary[]> {
 export type AuditSource = { type: "fixture"; id: string } | { type: "path"; path: string };
 
 export interface CreateAuditOptions {
+  demoScenario?: "mixed-outcomes";
   runtime?: boolean;
   maxAttempts?: number;
   autoApprovePreview?: boolean;
@@ -161,6 +162,10 @@ export function getEvidencePack(auditId: string): Promise<EvidencePack> {
 
 export function reportUrl(auditId: string): string {
   return `${API_BASE_URL}/api/audits/${auditId}/report`;
+}
+
+export function evidenceUrl(auditId: string): string {
+  return `${API_BASE_URL}/api/audits/${auditId}/evidence`;
 }
 
 export function artifactUrl(auditId: string, relPath: string): string {

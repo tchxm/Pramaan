@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * A short guided overlay for "Watch the demo" — so a judge seeing the
+ * A short guided overlay for the live demo — so a judge seeing the
  * workspace cold for the first time understands what each pane actually
  * means, without needing anyone to explain it out loud. Only mounted when
- * the audit URL carries `?tour=1` (wired from the landing page's "Watch
- * the demo" button through S1Start's auto-start). Purely presentational:
+ * the audit URL carries `?tour=1` (wired from the saved walkthrough's
+ * live-run link through S1Start's auto-start). Purely presentational:
  * reads the DOM via getBoundingClientRect, never touches store state.
  */
 interface Step {
@@ -23,7 +23,7 @@ const STEPS: Step[] = [
   {
     selector: ".scr-center-pane",
     title: "The exact code, and the fix",
-    text: "The real source file, with the finding highlighted, plus the bounded fix the agent proposes. Nothing here is applied until it's verified or a human approves it.",
+    text: "The real source file, with the finding highlighted, plus the bounded fix the agent proposes. Policy checks limit writes to an isolated workspace; the engine then verifies the changed project. Semantic changes require human approval.",
   },
   {
     selector: ".scr-right-pane",

@@ -14,6 +14,7 @@ import { MockLLMClient } from "../src/llm/mock.js";
 import { runAudit } from "../src/runAudit.js";
 import { isolatedFixtureCopy, makeTestIO, newAuditId } from "./helpers.js";
 import type { LLMResponse } from "../src/llm/client.js";
+import type { Audit } from "@pramaan/core";
 
 const cleanupDirs: string[] = [];
 afterEach(async () => {
@@ -30,12 +31,16 @@ describe("full success path", () => {
     const configPath = path.join(projectRoot, "pramaan.config.json");
     const auditId = newAuditId();
     const io = makeTestIO();
+    const progress: Audit[] = [];
+    io.onAuditUpdate = audit => progress.push(structuredClone(audit));
 
     let findingId = "";
 
     const llm = new MockLLMClient({
       responder: (messages, _tools, callIndex) => {
         if (callIndex === 0) {
+          expect(progress[0]?.findings).toHaveLength(1);
+          expect(progress[0]?.status).toBe("running");
           const userMsg = messages.find((m) => m.role === "user");
           const parsed = JSON.parse(userMsg?.content ?? "{}") as { findings: { findingId: string }[] };
           findingId = parsed.findings[0]?.findingId ?? "";

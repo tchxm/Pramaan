@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { updateRobotFraming } from "./robotFraming.js";
 
 /**
  * The boot gate's robot companion. Built to the reference's actual visual
@@ -42,11 +43,11 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
     camera.position.set(0, 0.25, 7.2);
 
     // ---- warm, restrained lighting: silhouette + edges, not a floodlight ----
-    scene.add(new THREE.HemisphereLight(0x3a2c14, 0x030201, 0.85));
-    const key = new THREE.DirectionalLight(0xd9a85c, 1.3);
+    scene.add(new THREE.HemisphereLight(0x163a35, 0x020605, 0.85));
+    const key = new THREE.DirectionalLight(0x67dfd2, 1.3);
     key.position.set(-2, 3, 4);
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0xe0b06a, 1.0);
+    const rim = new THREE.DirectionalLight(0x9ef2df, 1.0);
     rim.position.set(3, -1, -2.5);
     scene.add(rim);
 
@@ -57,25 +58,25 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
     glowCanvas.height = 256;
     const gctx = glowCanvas.getContext("2d")!;
     const grad = gctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    grad.addColorStop(0, "rgba(217, 168, 92, 0.55)");
-    grad.addColorStop(1, "rgba(217, 168, 92, 0)");
+    grad.addColorStop(0, "rgba(103, 223, 210, 0.035)");
+    grad.addColorStop(1, "rgba(103, 223, 210, 0)");
     gctx.fillStyle = grad;
     gctx.fillRect(0, 0, 256, 256);
     const glowTex = new THREE.CanvasTexture(glowCanvas);
     const glowMat = new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false });
     const glow = new THREE.Sprite(glowMat);
-    glow.scale.set(9, 9, 1);
+    glow.scale.set(5, 5, 1);
     glow.position.set(0, 0.6, -2.4);
     scene.add(glow);
 
     // ---- materials ----
-    const shell = new THREE.MeshStandardMaterial({ color: 0x15130f, metalness: 0.3, roughness: 0.75 });
-    const torsoMat = new THREE.MeshStandardMaterial({ color: 0x100e0a, metalness: 0.2, roughness: 0.85 });
+    const shell = new THREE.MeshStandardMaterial({ color: 0x0f1716, metalness: 0.3, roughness: 0.75 });
+    const torsoMat = new THREE.MeshStandardMaterial({ color: 0x0a1110, metalness: 0.2, roughness: 0.85 });
     const gold = new THREE.MeshStandardMaterial({
-      color: 0xc9a467,
+      color: 0x72ddcc,
       metalness: 0.65,
       roughness: 0.32,
-      emissive: 0x7a5a24,
+      emissive: 0x247a6a,
       emissiveIntensity: 0.55,
     });
     // Standard lighting leaves cables on the shadowed side of the head
@@ -84,14 +85,14 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
     // from every angle — a deliberate departure from physically-correct
     // shading in favor of staying readable.
     const cableMat = new THREE.MeshStandardMaterial({
-      color: 0x6b5633,
+      color: 0x336b60,
       metalness: 0.2,
       roughness: 0.5,
-      emissive: 0x4a3a20,
+      emissive: 0x204a40,
       emissiveIntensity: 1.1,
     });
-    const litMat = new THREE.MeshStandardMaterial({ color: 0xf0d9a0, emissive: 0xf0d9a0, emissiveIntensity: 0.9 });
-    const unlitMat = new THREE.MeshStandardMaterial({ color: 0x2a2620, roughness: 0.8 });
+    const litMat = new THREE.MeshStandardMaterial({ color: 0xb3f5e7, emissive: 0xb3f5e7, emissiveIntensity: 0.9 });
+    const unlitMat = new THREE.MeshStandardMaterial({ color: 0x202a27, roughness: 0.8 });
 
     const root = new THREE.Group();
     scene.add(root);
@@ -111,11 +112,11 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
     root.add(torso);
 
     const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.29, 0.16, 28), gold);
-    collar.position.set(0, 0.22, 0);
+    collar.position.set(0, 0.22, -0.18);
     root.add(collar);
 
     const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.5, 20), shell);
-    neck.position.set(0, 0.58, 0);
+    neck.position.set(0, 0.58, -0.38);
     root.add(neck);
 
     // ---- headPivot: ALL tracking rotation happens here, nothing else ----
@@ -185,15 +186,11 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       headPivot.add(hub);
       anchorLocal.push(hub.position.clone());
     }
-    // A third cable anchored to the torso shoulder, matching the
-    // reference's multi-cable composition.
-    const torsoAnchorWorld = new THREE.Vector3(0.15, -0.55, 0.42);
 
     // ---- Verlet cables ----
     const cables = [
       new VerletCable(10, anchorLocal[0]!, new THREE.Vector3(-0.55, -1.0, 0.3), headPivot),
       new VerletCable(10, anchorLocal[1]!, new THREE.Vector3(0.55, -1.0, 0.3), headPivot),
-      new VerletCable(8, new THREE.Vector3(0, -0.08, 0.15), torsoAnchorWorld, headPivot),
     ];
     const cableMeshes: THREE.Mesh[] = cables.map(() => {
       const m = new THREE.Mesh(new THREE.BufferGeometry(), cableMat);
@@ -205,32 +202,32 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       const w = screenCanvas.width;
       const h = screenCanvas.height;
       sctx.clearRect(0, 0, w, h);
-      sctx.fillStyle = "#050402";
+      sctx.fillStyle = "#020605";
       sctx.fillRect(0, 0, w, h);
 
       sctx.font = "600 15px 'JetBrains Mono', monospace";
-      sctx.fillStyle = "rgba(240, 217, 160, 0.7)";
+      sctx.fillStyle = "rgba(179, 245, 231, 0.7)";
       sctx.fillText("PRAMAAN / AUDIT ENGINE", 20, 32);
 
       sctx.textAlign = "center";
       sctx.font = "600 44px 'JetBrains Mono', monospace";
-      sctx.shadowColor = "#caa467";
+      sctx.shadowColor = "#72ddcc";
       sctx.shadowBlur = 16;
-      sctx.fillStyle = "#f3e6c6";
+      sctx.fillStyle = "#d8fff5";
       sctx.fillText("ENTER", w / 2, h / 2 - 6);
       sctx.shadowBlur = 0;
 
       sctx.font = "500 14px 'JetBrains Mono', monospace";
-      sctx.fillStyle = "rgba(220, 206, 176, 0.55)";
+      sctx.fillStyle = "rgba(176, 220, 208, 0.55)";
       sctx.fillText("click or press enter", w / 2, h / 2 + 34);
       sctx.textAlign = "left";
 
       sctx.font = "500 12px 'JetBrains Mono', monospace";
-      sctx.fillStyle = "rgba(168, 152, 120, 0.55)";
+      sctx.fillStyle = "rgba(120, 168, 158, 0.55)";
       sctx.fillText("the rules decide, the evidence proves it.", 20, h - 70);
 
       // faint scanlines
-      sctx.strokeStyle = "rgba(240, 217, 160, 0.035)";
+      sctx.strokeStyle = "rgba(179, 245, 231, 0.035)";
       for (let y = 0; y < h; y += 4) {
         sctx.beginPath();
         sctx.moveTo(0, y);
@@ -240,13 +237,31 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       screenTex.needsUpdate = true;
     }
 
+    root.updateWorldMatrix(true, true);
+    const headBounds = new THREE.Box3().setFromObject(headPivot);
+    const headAnchor = headBounds.getCenter(new THREE.Vector3());
+    const modelBounds = new THREE.Box3().setFromObject(root);
+    root.userData.framing = { head: headBounds, model: modelBounds };
+    const headHeight = headBounds.max.y - headBounds.min.y;
+    let framing = updateRobotFraming(window.innerWidth, window.innerHeight, headHeight);
+    let viewportWidth = 1;
+    let viewportHeight = 1;
+    const robotLookTarget = new THREE.Vector3();
     function resize() {
       const rect = mount!.getBoundingClientRect();
-      const w = Math.max(1, rect.width);
-      const h = Math.max(1, rect.height);
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
+      viewportWidth = Math.max(1, rect.width);
+      viewportHeight = Math.max(1, rect.height);
+      framing = updateRobotFraming(viewportWidth, viewportHeight, headHeight);
+      renderer.setSize(viewportWidth, viewportHeight, false);
+      camera.aspect = viewportWidth / viewportHeight;
+      camera.fov = framing.fov;
+      camera.position.set(headAnchor.x, headAnchor.y, framing.distance);
+      camera.lookAt(headAnchor);
+      camera.setViewOffset(viewportWidth, viewportHeight,
+        (0.5 - framing.centerX) * viewportWidth, (0.5 - framing.centerY) * viewportHeight,
+        viewportWidth, viewportHeight);
       camera.updateProjectionMatrix();
+      if (reducedMotion) renderer.render(scene, camera);
     }
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
@@ -272,7 +287,7 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
     const anchorScratch = new THREE.Vector3();
     let raf = 0;
     let t = 0;
-    const headBaseY = headPivot.position.y;
+
     function tick() {
       t += 0.016;
       const isEntering = enteringRef.current;
@@ -288,12 +303,18 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       // "Enter" dollies the camera into the screen — the robot-to-story
       // handoff. BootGate flashes at the peak, then unmounts this scene to
       // reveal HeroStory's own scene already rendering behind it.
-      const targetZ = isEntering ? 1.3 : 7.2;
-      const targetY2 = isEntering ? headBaseY + root.position.y : 0.25;
-      const targetFov = isEntering ? 56 : 26;
+      const targetZ = isEntering ? 1.3 : framing.distance;
+      const targetY2 = headAnchor.y + root.position.y;
+      const targetFov = isEntering ? 56 : framing.fov;
       camera.position.z += (targetZ - camera.position.z) * (isEntering ? 0.12 : 0.05);
       camera.position.y += (targetY2 - camera.position.y) * (isEntering ? 0.12 : 0.05);
       camera.fov += (targetFov - camera.fov) * (isEntering ? 0.12 : 0.05);
+      robotLookTarget.copy(headAnchor).add(root.position);
+      camera.lookAt(robotLookTarget);
+      if (isEntering && camera.view) {
+        camera.view.offsetX *= 0.88;
+        camera.view.offsetY *= 0.88;
+      }
       camera.updateProjectionMatrix();
       gold.emissiveIntensity = isEntering ? Math.min(2.0, gold.emissiveIntensity + 0.07) : 0.55;
 
@@ -301,8 +322,8 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       for (let i = 0; i < DOT_COUNT; i++) {
         const lit = i < litCount;
         const m = dots[i]!.material as THREE.MeshStandardMaterial;
-        m.color.set(lit ? 0xf0d9a0 : 0x2a2620);
-        m.emissive.set(lit ? 0xf0d9a0 : 0x000000);
+        m.color.set(lit ? 0xb3f5e7 : 0x202a27);
+        m.emissive.set(lit ? 0xb3f5e7 : 0x000000);
         m.emissiveIntensity = lit ? 0.9 : 0;
       }
 
@@ -310,6 +331,7 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       for (let i = 0; i < cables.length; i++) {
         const cable = cables[i]!;
         cable.anchorObject.localToWorld(anchorScratch.copy(cable.anchorLocal));
+        root.worldToLocal(anchorScratch);
         cable.simulate(anchorScratch, reducedMotion);
         cable.writeTube(cableMeshes[i]!);
       }

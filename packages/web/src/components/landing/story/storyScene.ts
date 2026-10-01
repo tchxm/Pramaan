@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { updateRobotFraming } from "../robotFraming.js";
+import { sampleVoice } from "../voice.js";
 
 /**
  * The single Three.js scene behind the home page's 5-beat scroll story.
@@ -243,7 +245,7 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
 
   // ---------------- Robot ----------------
   const robotRoot = new THREE.Group();
-  robotRoot.position.set(-2.2, -0.3, 1);
+  robotRoot.position.set(0, 0, 0);
   scene.add(robotRoot);
 
   const shellMat = new THREE.MeshStandardMaterial({ color: 0x07110f, metalness: 0.5, roughness: 0.45 });
@@ -260,11 +262,11 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
   robotRoot.add(torso);
 
   const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.27, 0.14, 24), goldMat);
-  collar.position.set(0, 0.21, 0);
+  collar.position.set(0, 0.21, -0.18);
   robotRoot.add(collar);
 
   const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.46, 18), shellMat);
-  neck.position.set(0, 0.56, 0);
+  neck.position.set(0, 0.56, -0.36);
   robotRoot.add(neck);
 
   const headPivot = new THREE.Group();
@@ -294,6 +296,7 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
   screenCanvas.height = 420;
   const sctx = screenCanvas.getContext("2d")!;
   const screenTex = new THREE.CanvasTexture(screenCanvas);
+  screenTex.colorSpace = THREE.SRGBColorSpace;
   const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(SCREEN_W, SCREEN_H), screenMat);
   screen.position.set(0, 0, BEZEL_FRONT_REAL + 0.03);
@@ -337,11 +340,11 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
     sctx.fillStyle = "rgba(78, 230, 184, 0.75)";
     sctx.fillText(currentText.header, 18, 28);
     sctx.textAlign = "center";
-    sctx.font = "600 38px 'JetBrains Mono', monospace";
+    sctx.font = "600 42px 'JetBrains Mono', monospace";
     sctx.shadowColor = "#9ff7dd";
     sctx.shadowBlur = 16;
     sctx.fillStyle = "#c8fff0";
-    sctx.fillText(currentText.action, w / 2, h / 2);
+    sctx.fillText(currentText.action, w / 2, h / 2, w - 44);
     sctx.shadowBlur = 0;
     sctx.font = "500 14px 'JetBrains Mono', monospace";
     sctx.fillStyle = "rgba(201, 230, 221, 0.55)";
@@ -359,12 +362,28 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
   }
   drawScreen();
 
+  // Inspect actual geometry once; the visual pivot is the CRT, not the lathe origin.
+  robotRoot.updateWorldMatrix(true, true);
+  const headBounds = new THREE.Box3().setFromObject(headPivot);
+  const modelBounds = new THREE.Box3().setFromObject(robotRoot);
+  const headAnchor = headBounds.getCenter(new THREE.Vector3());
+  const headHeight = headBounds.max.y - headBounds.min.y;
+  const torsoExcess = headAnchor.y - modelBounds.min.y;
+  robotRoot.userData.framing = { headHeight, torsoExcess, headAnchor: headAnchor.toArray() };
+  let width = 1;
+  let height = 1;
+  let framing = updateRobotFraming(1440, 900, headHeight);
+  const robotLookTarget = new THREE.Vector3();
+  const lookTarget = new THREE.Vector3();
   function resize(): void {
     const rect = mount.getBoundingClientRect();
-    const w = Math.max(1, rect.width);
-    const h = Math.max(1, rect.height);
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+    width = Math.max(1, rect.width);
+    height = Math.max(1, rect.height);
+    framing = updateRobotFraming(width, height, headHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 1024 ? 1.25 : 1.75));
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.fov = framing.fov;
     camera.updateProjectionMatrix();
   }
   resize();
@@ -374,37 +393,35 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
 
   function update(progress: number, pointerX: number, pointerY: number, dt: number): void {
     t += dt;
+    const amplitude = sampleVoice(performance.now(), dt);
+    // Heavy subject: voice changes only CRT luminance, never its framing.
+    screenMat.color.setScalar(1 + amplitude * 0.12);
 
     // Beat windows: [0,.2) identify, [.2,.4) detect, [.4,.6) investigate,
     // [.6,.8) verify, [.8,1] prove.
-    const bNetwork = 1 - smoothstep(0.32, 0.5, progress); // network dominant through beats 1-2, fades into 3
-    const bRobot = smoothstep(0.28, 0.42, progress) * (1 - smoothstep(0.72, 0.88, progress));
-    const bAmbient = smoothstep(0.78, 0.92, progress); // both dim to near-ambient for verify/evidence beats
-
-    networkGroup.visible = bNetwork > 0.01;
-    const netOpacity = bNetwork * (1 - bAmbient * 0.7);
-    (netParticles.material as THREE.PointsMaterial).opacity = 0.85 * netOpacity;
-    hubMat.opacity = 0.95 * netOpacity;
+    const robotFocus = smoothstep(0.30, 0.46, progress);
+    const bRobot = smoothstep(0.34, 0.46, progress);
+    // The network retreats before the CRT arrives, then remains only a faint context.
+    const netOpacity = THREE.MathUtils.lerp(1, 0.055, smoothstep(0.28, 0.38, progress)) * (1 - smoothstep(0.72, 0.88, progress));
+    networkGroup.visible = netOpacity > 0.005;
+    (netParticles.material as THREE.PointsMaterial).opacity = 0.65 * netOpacity;
+    hubMat.opacity = 0.75 * netOpacity;
     lineMat.opacity = 0.15 * netOpacity;
-    innerShellMat.opacity = 0.1 * netOpacity;
-    networkGroup.rotation.y = t * 0.12;
-    networkGroup.scale.setScalar(THREE.MathUtils.lerp(1, 0.72, smoothstep(0.0, 0.3, progress)));
-    networkGroup.position.x = THREE.MathUtils.lerp(1.6, 3.0, smoothstep(0.0, 0.3, progress));
+    innerShellMat.opacity = 0.06 * netOpacity;
+    networkGroup.rotation.y = reducedMotion ? 0 : t * 0.06;
+    const sphereScale = framing.viewHeight * (width < 1024 ? 0.19 : 0.28) / R;
+    networkGroup.scale.setScalar(sphereScale * THREE.MathUtils.lerp(1, 0.75, robotFocus) * (1 + (reducedMotion ? 0 : amplitude * 0.025)));
+    networkGroup.position.set(0, 0, -robotFocus * 2);
 
-    robotRoot.visible = bRobot > 0.01 || bAmbient > 0.01;
-    const robotOpacity = Math.max(bRobot, bAmbient * 0.35);
-    setGroupOpacity(robotRoot, robotOpacity);
-    const robotFocus = smoothstep(0.3, 0.46, progress) * (1 - smoothstep(0.7, 0.86, progress));
-    robotRoot.position.x = THREE.MathUtils.lerp(-2.2, 0, robotFocus);
-    robotRoot.position.y = THREE.MathUtils.lerp(-0.3, -0.75, robotFocus);
-    robotRoot.position.z = THREE.MathUtils.lerp(1, 3.0, robotFocus);
-    robotRoot.scale.setScalar(THREE.MathUtils.lerp(0.85, 1.05, robotFocus));
-
-    const targetYaw = pointerX * THREE.MathUtils.degToRad(10);
-    const targetPitch = pointerY * THREE.MathUtils.degToRad(5);
+    robotRoot.visible = bRobot > 0.01;
+    setGroupOpacity(robotRoot, bRobot);
+    // Normalize the model around its measured head anchor. No torso-driven fit.
+    robotRoot.position.copy(headAnchor).multiplyScalar(-1);
+    robotRoot.position.y += reducedMotion ? 0 : Math.sin(t * 0.7) * 0.006;
+    const targetYaw = reducedMotion ? 0 : THREE.MathUtils.clamp(pointerX, -1, 1) * THREE.MathUtils.degToRad(10);
+    const targetPitch = reducedMotion ? 0 : THREE.MathUtils.clamp(pointerY, -1, 1) * THREE.MathUtils.degToRad(5);
     headPivot.rotation.y += (targetYaw - headPivot.rotation.y) * 0.05;
     headPivot.rotation.x += (targetPitch - headPivot.rotation.x) * 0.05;
-    robotRoot.position.y += Math.sin(t * 0.7) * 0.025;
 
     if (screenDirty) drawScreen();
 
@@ -412,14 +429,22 @@ export function createStoryScene(mount: HTMLElement, reducedMotion: boolean): St
     for (let i = 0; i < cables.length; i++) {
       const cable = cables[i]!;
       cable.anchorObject.localToWorld(anchorScratch.copy(cable.anchorLocal));
+      robotRoot.worldToLocal(anchorScratch);
       cable.simulate(anchorScratch);
       cable.writeTube(cableMeshes[i]!);
     }
 
-    camera.position.x = THREE.MathUtils.lerp(0, -0.4, robotFocus) + pointerX * 0.15;
-    camera.position.y = pointerY * 0.08;
-    camera.position.z = THREE.MathUtils.lerp(9, 7.0, robotFocus);
-    camera.lookAt(THREE.MathUtils.lerp(0.4, 0, robotFocus), 0, 0);
+    // Both endpoints share the same on-screen anchor, preserving the handoff.
+    robotLookTarget.copy(headAnchor).add(robotRoot.position);
+    robotLookTarget.y -= 0.04; // upper-neck bias, never the torso origin
+    lookTarget.set(0, 0, 0).lerp(robotLookTarget, robotFocus);
+    camera.position.set(lookTarget.x, lookTarget.y, framing.distance);
+    camera.lookAt(lookTarget);
+    // The portrait gate rail needs more clearance than investigation copy.
+    const tabletCenterY = THREE.MathUtils.lerp(framing.centerY, 0.76, smoothstep(0.56, 0.60, progress));
+    const centerY = width < 1024 ? THREE.MathUtils.lerp(0.75, tabletCenterY, robotFocus) : framing.centerY;
+    camera.setViewOffset(width, height, (0.5 - framing.centerX) * width,
+      (0.5 - centerY) * height, width, height);
 
     renderer.render(scene, camera);
   }

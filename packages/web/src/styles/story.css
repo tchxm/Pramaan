@@ -13,6 +13,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--bench);
 }
@@ -32,7 +33,8 @@
   padding: 0 var(--space-5);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s linear;
+  /* The scroll envelope already smooths opacity. CSS lag would leave two
+     paragraphs occupying the same safe zone during the handoff. */
 }
 
 @media (min-width: 768px) {
@@ -42,12 +44,55 @@
 }
 
 .story__beat-inner {
-  max-width: 640px;
+  width: 38vw;
+  max-width: 560px;
+}
+
+@media (min-width: 1024px) {
+  .story__beat--1 { align-items: flex-start; padding-top: clamp(100px, 12vh, 150px); }
+  .story__beat--1 .story__beat-inner { width: 42vw; max-width: 600px; }
+  .story__beat--1 .lp-headline { font-size: clamp(30px, 3.1vw, 48px); margin-bottom: 20px; }
+  .story__beat--1 .lp-lede { font-size: 16px; min-height: 6.6em; }
+  .story__beat--1 .lp-actions { margin-top: 20px; }
 }
 
 .story__beat--4 .story__beat-inner,
 .story__beat--5 .story__beat-inner {
   max-width: 560px;
+}
+
+.story__canvas-mount canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.story__sound {
+  position: absolute;
+  z-index: 4;
+  left: var(--space-8);
+  bottom: 28px;
+  min-height: 44px;
+  background: transparent;
+  color: var(--slate);
+}
+.story--simple .story__sound { position: static; align-self: flex-start; margin-top: 16px; }
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .story__beat {
+    align-items: flex-start;
+    padding: 112px 40px 0;
+  }
+  .story__beat-inner {
+    width: 100%;
+    max-width: 620px;
+  }
+  .story__h2 { font-size: 38px; }
+  .story__beat--1 .lp-headline { font-size: 40px; }
+  .story__beat--1 .lp-actions { margin-top: 20px; }
 }
 
 .story__eyebrow {
@@ -183,9 +228,31 @@
 
 .story__simple-beat--1 {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.story__static-signal {
+  display: block;
+  width: min(72vw, 280px);
+  max-height: 27dvh;
+  flex-shrink: 0;
+  align-self: center;
+  color: #57e6c0;
+  margin: 12px auto;
+}
+
+@media (max-width: 767px) {
+  .story__simple-beat--1 { padding-top: 94px; padding-bottom: 28px; }
+  .story__simple-beat--1 .lp-headline { font-size: clamp(30px, 8vw, 40px); margin-bottom: 16px; }
+  .story__simple-beat--1 .lp-lede { font-size: 15px; }
+  .story__simple-beat--1 .lp-actions { margin-top: 12px; }
+  .lp-page .lp-pill { min-height: 44px; }
+  .lp-gate__robot { display: none; }
+  .lp-gate { background: #08090b; }
+  .lp-gate__log { top: 37%; bottom: auto; gap: 16px; width: 84vw; }
 }
 
 .story__simple-beat .story__rail--simple {

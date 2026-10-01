@@ -5,8 +5,9 @@
 // not silently fail.
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import { fileURLToPath } from "node:url";
 
-const ROOT = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SERVER_PORT = Number(process.env.PORT ?? 8787);
 
 function run(cmd, args, opts = {}) {
@@ -60,7 +61,7 @@ async function main() {
   await buildStep("building server", "npm", ["run", "build", "--workspace=packages/server"]);
 
   console.log("\n[demo] starting API server on port " + SERVER_PORT + "...");
-  const server = runCapture("node", ["packages/server/dist/app.js"], {
+  const server = runCapture("node", ["--env-file-if-exists=.env", "packages/server/dist/app.js"], {
     env: { ...process.env, PORT: String(SERVER_PORT) },
   });
 

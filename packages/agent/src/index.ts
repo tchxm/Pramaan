@@ -1,4 +1,5 @@
 export { runAudit } from "./runAudit.js";
+export { MittiMartDemoClient } from "./llm/mittiMartDemo.js";
 export type { RunAuditOptions, RunAuditIO } from "./runAudit.js";
 
 export * from "./llm/index.js";

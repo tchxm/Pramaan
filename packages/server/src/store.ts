@@ -14,7 +14,7 @@ import {
   type PatchResult,
   type VerifyResult,
 } from "@pramaan/core";
-import { runAudit, type RunAuditIO } from "@pramaan/agent";
+import { runAudit, MittiMartDemoClient, type RunAuditIO } from "@pramaan/agent";
 import { nextAuditId } from "./counter.js";
 import { randomSecret, mintApprovalToken, mintApprovalTokenFromHash, verifyApprovalTokenFromHash } from "./security.js";
 
@@ -23,6 +23,7 @@ export const ENGINE_VERSION = "0.1.0";
 export type AuditSource = { type: "fixture"; id: string } | { type: "path"; path: string };
 
 export interface CreateAuditOptions {
+  demoScenario?: "mixed-outcomes";
   runtime?: boolean;
   maxAttempts?: number;
   autoApprovePreview?: boolean;
@@ -211,7 +212,18 @@ export class AuditStore {
     if (!record) return;
 
     const io: RunAuditIO = {
+      onAuditUpdate: (audit) => {
+        // Copy engine state before broadcasting events. The agent's mutable
+        // findings must not silently mutate the last snapshot handed to SSE.
+        record.audit = structuredClone(audit);
+      },
       emit: (event) => {
+        if (event.type === "tool.result" && event.payload.name === "patch.propose") {
+          const result = event.payload.result as { ok?: boolean; data?: PatchProposal };
+          if (result?.ok && result.data && !record.proposals.some(p => p.proposalId === result.data!.proposalId)) record.proposals.push(result.data);
+        }
+        if (event.type === "patch.applied" && event.payload.result) record.results.push(event.payload.result as PatchResult);
+        if (event.type === "verify.result" && event.payload.result) record.verifies.push(event.payload.result as VerifyResult);
         void this.appendTrace(auditId, {
           type: event.type,
           actor: event.actor,
@@ -257,7 +269,8 @@ export class AuditStore {
           maxAttemptsPerFinding: record.options.maxAttempts,
           runtimeEnabled: record.options.runtime,
           autoApprovePreview: record.options.autoApprovePreview,
-          mode: "live",
+          mode: record.options.demoScenario ? "replay" : "live",
+          llmClient: record.options.demoScenario ? new MittiMartDemoClient() : undefined,
         },
         io,
       );
