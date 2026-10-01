@@ -3,6 +3,7 @@ dist/
 build/
 .pramaan/
 pramaan-report/
+fixtures/.tmp-agent-tests/
 *.log
 .DS_Store
 coverage/

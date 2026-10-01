@@ -9,7 +9,7 @@
     ".": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json",
+    "build": "tsc -b tsconfig.json && node -e \"require('fs').cpSync('src/regulation/data','dist/regulation/data',{recursive:true})\"",
     "test": "vitest run"
   },
   "dependencies": {
