@@ -1,4 +1,5 @@
 import "../../styles/landing.css";
+import BootGate from "./BootGate.js";
 import HeroGlobe from "./HeroGlobe.js";
 import TopNavigation from "./TopNavigation.js";
 import HeroIntro from "./HeroIntro.js";
@@ -12,6 +13,7 @@ import HeroActions from "./HeroActions.js";
 export default function LandingPage() {
   return (
     <div className="lp-page">
+      <BootGate />
       <HeroGlobe />
 
       <TopNavigation />

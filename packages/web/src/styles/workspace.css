@@ -138,26 +138,28 @@
 .ws-finding-row {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   width: 100%;
   min-height: 32px;
-  padding: 8px 10px;
-  background: var(--panel);
-  border: none;
-  border-bottom: 1px solid var(--rule);
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--panel-raised);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
   text-align: left;
   cursor: pointer;
   color: var(--ink);
   font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ws-finding-row:hover {
-  background: var(--bench);
+  border-color: var(--tag);
 }
 
 .ws-finding-row--selected {
-  background: var(--bench);
-  box-shadow: inset 3px 0 0 var(--link);
+  border-color: var(--tag);
+  box-shadow: var(--glow);
 }
 
 .ws-finding-row__title {
@@ -229,9 +231,9 @@
 .ws-status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: 3px;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 18px;
   border: 1px solid var(--rule);
   font-family: var(--ws-font);
   font-size: 13px;
@@ -247,11 +249,13 @@
 .ws-status-pill--open {
   color: var(--violation);
   border-color: var(--violation);
+  background: var(--diff-del);
 }
 
 .ws-status-pill--awaiting_approval {
   color: var(--review);
   border-color: var(--review);
+  background: rgba(241, 195, 90, 0.1);
 }
 
 .ws-status-pill--remediating {
@@ -262,16 +266,19 @@
 .ws-status-pill--verified {
   color: var(--verified);
   border-color: var(--verified);
+  background: var(--diff-add);
 }
 
 .ws-status-pill--static_verified {
   color: var(--review);
   border-color: var(--review);
+  background: rgba(241, 195, 90, 0.1);
 }
 
 .ws-status-pill--failed {
   color: var(--violation);
   border-color: var(--violation);
+  background: var(--diff-del);
 }
 
 .ws-status-pill--ignored {

@@ -295,3 +295,128 @@
     animation: none;
   }
 }
+
+/* ---------- Boot gate ---------- */
+
+.lp-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 40%, #0f2420 0%, #081512 46%, #05100d 78%);
+  clip-path: inset(0);
+  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lp-gate--closing {
+  clip-path: inset(0 0 100% 0);
+  pointer-events: none;
+}
+
+.lp-gate__chrome {
+  position: absolute;
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  letter-spacing: 0.03em;
+  color: var(--tag);
+}
+
+.lp-gate__chrome--tl {
+  top: 28px;
+  left: 5vw;
+}
+
+.lp-gate__chrome--tr {
+  top: 28px;
+  right: 5vw;
+}
+
+.lp-gate__word {
+  position: absolute;
+  top: 18%;
+  left: 5vw;
+  right: 5vw;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(56px, 14vw, 190px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(78, 230, 184, 0.2);
+}
+
+.lp-gate__log {
+  position: absolute;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(480px, 84vw);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  color: var(--slate);
+  text-align: left;
+}
+
+.lp-gate__start {
+  position: absolute;
+  bottom: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 180px;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: 3px;
+  border: 1px solid var(--tag);
+  background: transparent;
+  color: var(--tag);
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  box-shadow: var(--glow);
+}
+
+.lp-gate__start:not(:disabled):hover {
+  background: var(--tag);
+  color: var(--bench);
+}
+
+.lp-gate__start:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.lp-gate__skip {
+  position: absolute;
+  bottom: 24px;
+  right: 5vw;
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: var(--slate);
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.lp-gate__skip:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 700px) {
+  .lp-gate__word {
+    top: 22%;
+    font-size: 17vw;
+  }
+  .lp-gate__chrome--tr {
+    top: 52px;
+  }
+}

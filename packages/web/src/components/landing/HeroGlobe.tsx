@@ -53,8 +53,8 @@ export default function HeroGlobe() {
       return new THREE.CanvasTexture(c);
     }
 
-    const goldTex = glowTexture("#d6a84a");
-    const creamTex = glowTexture("#f3f1ea");
+    const goldTex = glowTexture("#4ee6b8");
+    const creamTex = glowTexture("#eef6f2");
 
     // Fibonacci sphere point distribution.
     const N = 620;
@@ -131,7 +131,7 @@ export default function HeroGlobe() {
     const lines = new THREE.LineSegments(
       lineGeo,
       new THREE.LineBasicMaterial({
-        color: 0xd6a84a,
+        color: 0x4ee6b8,
         transparent: true,
         opacity: 0.15,
         blending: THREE.AdditiveBlending,
@@ -143,7 +143,7 @@ export default function HeroGlobe() {
     // Inner faint wireframe shell for depth.
     const inner = new THREE.Mesh(
       new THREE.IcosahedronGeometry(1.5, 1),
-      new THREE.MeshBasicMaterial({ color: 0xd6a84a, wireframe: true, transparent: true, opacity: 0.1 }),
+      new THREE.MeshBasicMaterial({ color: 0x4ee6b8, wireframe: true, transparent: true, opacity: 0.1 }),
     );
     root.add(inner);
 

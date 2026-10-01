@@ -6,19 +6,20 @@
      only the values changed, so screens.css/workspace.css reskin for free.
      Verdict colors (violation/verified/review) are tuned for >=4.5:1
      contrast against --bench and --panel on dark backgrounds. */
-  --bench: #0b0c0a;
-  --panel: #15170f;
-  --panel-raised: #1b1d16;
-  --ink: #f3f1ea;
-  --slate: #a9a79d;
-  --rule: #2a2c26;
-  --tag: #d6a84a;
+  --bench: #08100e;
+  --panel: #0e1a17;
+  --panel-raised: #132621;
+  --ink: #eef6f2;
+  --slate: #93a8a0;
+  --rule: #1e3530;
+  --tag: #4ee6b8;
   --violation: #ff8183;
-  --verified: #7fe8ac;
+  --verified: #4ee6b8;
   --review: #f1c35a;
-  --link: #8cc0ef;
-  --diff-add: rgba(127, 232, 172, 0.12);
+  --link: #5eead4;
+  --diff-add: rgba(78, 230, 184, 0.12);
   --diff-del: rgba(255, 129, 131, 0.12);
+  --glow: 0 0 0 1px rgba(78, 230, 184, 0.18), 0 0 24px rgba(78, 230, 184, 0.08);
 
   /* Spacing scale — none existed before; screens.css/workspace.css used
      hardcoded px throughout. New rules should prefer these. */

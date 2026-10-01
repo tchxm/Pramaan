@@ -78,7 +78,7 @@ export default function HeroCanvas() {
               Math.min(1, Math.hypot((a.x + b.x) / 2 - pointer.x, (a.y + b.y) / 2 - pointer.y) / 220)
             : 0;
           const alpha = (1 - dist / maxDist) * (0.06 + nearPointer * 0.18);
-          ctx!.strokeStyle = `rgba(214, 168, 74, ${alpha})`;
+          ctx!.strokeStyle = `rgba(78, 230, 184, ${alpha})`;
           ctx!.lineWidth = 1;
           ctx!.beginPath();
           ctx!.moveTo(a.x, a.y);
