@@ -66,6 +66,17 @@ function phaseForEvent(type: TraceEvent["type"], current: WorkspacePhase): Works
 }
 
 let activeUnsubscribe: (() => void) | null = null;
+// Guards against a stale connection's late-arriving data clobbering a newer
+// one. React 18 StrictMode double-invokes the mount effect in dev, opening
+// two near-simultaneous SSE connections for the same auditId; aborting the
+// first doesn't guarantee its in-flight response is discarded before it's
+// already been read. Without this token, a slow/aborted first connection's
+// snapshot (captured before a fast-completing audit had finished, e.g. with
+// no LLM configured) can arrive after the second connection's correct,
+// final snapshot and silently overwrite real findings with an empty
+// placeholder. Every handler checks its own call's token before calling
+// `set()`; only the most recent connect() can ever mutate the store.
+let connectGeneration = 0;
 
 export const useAuditStore = create<AuditStoreState>((set, get) => ({
   auditId: null,
@@ -84,6 +95,7 @@ export const useAuditStore = create<AuditStoreState>((set, get) => ({
 
   connect: (auditId: string) => {
     activeUnsubscribe?.();
+    const myGeneration = ++connectGeneration;
     set({
       auditId,
       audit: null,
@@ -100,9 +112,13 @@ export const useAuditStore = create<AuditStoreState>((set, get) => ({
     });
 
     activeUnsubscribe = subscribeToAuditEvents(eventsUrl(auditId), {
-      onConnectionChange: (connection) => set({ connection }),
+      onConnectionChange: (connection) => {
+        if (myGeneration !== connectGeneration) return;
+        set({ connection });
+      },
 
       onSnapshot: (payload: AuditSnapshotPayload) => {
+        if (myGeneration !== connectGeneration) return;
         const audit = payload.audit as Audit;
         const findings = payload.findings as Finding[];
         const pendingApprovals = payload.pendingApprovals as ApprovalRequest[];
@@ -117,6 +133,7 @@ export const useAuditStore = create<AuditStoreState>((set, get) => ({
       },
 
       onTraceEvent: (event: TraceEvent) => {
+        if (myGeneration !== connectGeneration) return;
         const state = get();
 
         // Dedup by seq — reconnect may replay events we already have.
@@ -194,6 +211,7 @@ export const useAuditStore = create<AuditStoreState>((set, get) => ({
   disconnect: () => {
     activeUnsubscribe?.();
     activeUnsubscribe = null;
+    connectGeneration += 1; // invalidate any handlers still in flight
     set({ connection: "closed" });
   },
 

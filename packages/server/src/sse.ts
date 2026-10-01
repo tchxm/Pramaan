@@ -47,9 +47,6 @@ export function streamAuditEvents(
     ...corsHeaders,
   });
 
-  const record = store.get(auditId);
-  const maxSeq = record ? record.trace.at(-1)?.seq ?? 0 : 0;
-
   // Replay every trace event the client hasn't seen yet — on a fresh
   // connect (no Last-Event-ID) that means the FULL history from seq 0, not
   // just events from here on. Without this, opening or refreshing the
@@ -58,7 +55,7 @@ export function streamAuditEvents(
   // strip despite the full provenance record existing on the server —
   // undermining the actual "evidence" product claim. Sent in chronological
   // order BEFORE the snapshot, so the client's last-seen id ends up at
-  // `maxSeq` (from the snapshot) rather than regressing backwards.
+  // the snapshot's seq rather than regressing backwards.
   const afterSeq = lastEventId ? Number.parseInt(lastEventId, 10) : 0;
   if (Number.isFinite(afterSeq)) {
     for (const event of store.eventsAfter(auditId, afterSeq)) {
@@ -66,16 +63,44 @@ export function streamAuditEvents(
     }
   }
 
-  // audit.snapshot is sent last, so it reflects current state once the
-  // client has replayed everything that led up to it.
-  const snapshot = store.snapshot(auditId);
-  if (snapshot) {
-    writeSnapshot(reply, maxSeq, snapshot);
+  // Events whose arrival means `record.audit` just changed in a way the
+  // client's snapshot-derived state (findingsById, audit.findings, etc.)
+  // can't reconstruct from the event payload alone — scan.completed's
+  // payload is just a count, not the findings array itself.
+  const SNAPSHOT_REFRESH_EVENTS = new Set([
+    "scan.completed",
+    "patch.applied",
+    "verify.result",
+    "evidence.generated",
+    "audit.completed",
+  ]);
+
+  // `record.audit` is reassigned to the final Audit object by runAudit()'s
+  // CALLER, strictly after that promise resolves — which is strictly after
+  // the LAST trace event (e.g. audit.completed) was emitted from inside
+  // runAudit() itself. A client connecting in that narrow window (very
+  // reachable for a fast, no-LLM audit: POST /api/audits returns 202
+  // immediately while runAudit() runs fire-and-forget, so a client can
+  // easily connect before OR in the gap right after it finishes) would see
+  // the full historical trace already replayed above, yet still get an
+  // empty-findings snapshot — and since the audit already finished, no
+  // FUTURE event will ever arrive to let it self-correct. setImmediate
+  // defers past the current microtask queue, by which point any in-flight
+  // assignment has landed, so this always sends a truthful snapshot.
+  function sendFreshSnapshot(seq: number): void {
+    setImmediate(() => {
+      const fresh = store.snapshot(auditId);
+      if (fresh) writeSnapshot(reply, seq, fresh);
+    });
   }
 
   const unsubscribe = store.subscribe(auditId, (event) => {
     writeEvent(reply, event);
+    if (SNAPSHOT_REFRESH_EVENTS.has(event.type)) sendFreshSnapshot(event.seq);
   });
+
+  const initialMaxSeq = store.get(auditId)?.trace.at(-1)?.seq ?? 0;
+  sendFreshSnapshot(initialMaxSeq);
 
   const heartbeat = setInterval(() => {
     reply.raw.write(`: ping\n\n`);
