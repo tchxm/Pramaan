@@ -299,13 +299,19 @@
 /* ---------- Boot gate ---------- */
 
 .lp-gate {
+  /* Warm gold/black palette, scoped to this entry ceremony only — the rest
+     of the product stays on the teal evidence-grade system. This is a
+     deliberate, contained choice to match the companion-robot reference
+     closely, not a site-wide rebrand. */
+  --gate-gold: #c9a467;
+  --gate-gold-bright: #f3e6c6;
   position: fixed;
   inset: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at 50% 40%, #0f2420 0%, #081512 46%, #05100d 78%);
+  background: radial-gradient(ellipse at 50% 42%, #2a1d0c 0%, #140d05 45%, #060402 80%);
   clip-path: inset(0);
   transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -329,7 +335,7 @@
   position: absolute;
   inset: 0;
   z-index: 2;
-  background: radial-gradient(ellipse at 50% 40%, #eef6f2 0%, #9ff7dd 38%, transparent 72%);
+  background: radial-gradient(ellipse at 50% 40%, #fff6e2 0%, #f3cf8a 38%, transparent 72%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s ease-out;
@@ -357,7 +363,7 @@
   font-family: var(--ws-mono, "JetBrains Mono", monospace);
   font-size: var(--text-xs);
   letter-spacing: 0.03em;
-  color: var(--tag);
+  color: var(--gate-gold);
 }
 
 .lp-gate__chrome--tl {
@@ -383,7 +389,7 @@
   line-height: 0.9;
   letter-spacing: -0.04em;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(78, 230, 184, 0.2);
+  -webkit-text-stroke: 1px rgba(201, 164, 103, 0.22);
 }
 
 .lp-gate__robot {
@@ -423,20 +429,20 @@
   min-height: 48px;
   padding: var(--space-3) var(--space-5);
   border-radius: 3px;
-  border: 1px solid var(--tag);
+  border: 1px solid var(--gate-gold);
   background: transparent;
-  color: var(--tag);
+  color: var(--gate-gold-bright);
   font-family: var(--ws-mono, "JetBrains Mono", monospace);
   font-size: var(--text-sm);
   letter-spacing: 0.03em;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
-  box-shadow: var(--glow);
+  box-shadow: 0 0 0 1px rgba(201, 164, 103, 0.18), 0 0 24px rgba(201, 164, 103, 0.1);
 }
 
 .lp-gate__start:not(:disabled):hover {
-  background: var(--tag);
-  color: var(--bench);
+  background: var(--gate-gold);
+  color: #140d05;
 }
 
 .lp-gate__start:disabled {
