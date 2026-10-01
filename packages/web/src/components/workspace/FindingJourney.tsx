@@ -1,4 +1,9 @@
-import type { Finding, TraceEvent, VerifyResult } from "@pramaan/core";
+import type { Finding, TraceEvent, VerifyResult } from "../../types/core";
+
+export function reviewLabel(finding: Finding, hasProposal: boolean): string | undefined {
+  const reason = finding.failure?.data?.summary;
+  return finding.status === "failed" && typeof reason === "string" && reason.startsWith("Demo ") ? hasProposal ? "Proposal ready · not applied" : "Needs human review" : undefined;
+}
 
 export function findingProgressLabel(finding: Finding, hasProposal: boolean, verify?: VerifyResult, evidenceReady = false): string {
   if (verify?.verdict === "VERIFIED" || verify?.verdict === "STATIC_VERIFIED") return evidenceReady ? "Verified · evidence recorded" : "Verified · preparing evidence";

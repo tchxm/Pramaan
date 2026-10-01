@@ -1,8 +1,9 @@
-import type { FindingStatus } from "@pramaan/core";
+import type { FindingStatus } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface StatusPillProps {
   status: FindingStatus;
+  label?: string;
 }
 
 // Fixed copy — spec Section 18.6. "remediating" is not in the spec's table
@@ -82,13 +83,13 @@ function Icon({ status }: { status: FindingStatus }): JSX.Element {
 // `data-testid="verdict-chip"` at the one call site that needs it (e.g. a
 // single-finding detail view), by wrapping or spreading props onto the
 // rendered <span>.
-export function StatusPill({ status }: StatusPillProps): JSX.Element {
+export function StatusPill({ status, label }: StatusPillProps): JSX.Element {
   return (
-    <span className={`ws-status-pill ws-status-pill--${status}`}>
+    <span className={`ws-status-pill ws-status-pill--${label && status === "failed" ? "awaiting_approval" : status}`}>
       <span className="ws-status-pill__icon">
         <Icon status={status} />
       </span>
-      {STATUS_TEXT[status]}
+      {label ?? STATUS_TEXT[status]}
     </span>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { ApprovalRequest } from "@pramaan/core";
+import type { ApprovalRequest } from "../../types/core";
 import "../../styles/workspace.css";
 
 export type ApprovalDecision = "approve" | "reject" | "edit" | "ignore";

@@ -6,7 +6,7 @@
 // get the same ink-filled "Engine" chip look without a cross-file import.
 // When `pending` is true (verification not yet run/finished) every gate
 // renders as an explicit pending state — never a fabricated pass or fail.
-import type { GateId, VerifyResult } from "@pramaan/core";
+import type { GateId, VerifyResult } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface GatesPanelProps {
@@ -15,11 +15,11 @@ export interface GatesPanelProps {
 }
 
 const GATE_ORDER: { id: GateId; label: string }[] = [
-  { id: "G1_DETECTOR_CLEAR", label: "G1 · Detector clear" },
-  { id: "G2_PRESERVATION", label: "G2 · Preservation" },
-  { id: "G3_BUILD", label: "G3 · Build" },
-  { id: "G4_RUNTIME", label: "G4 · Runtime" },
-  { id: "G5_NO_REGRESSION", label: "G5 · No regression" },
+  { id: "G1_DETECTOR_CLEAR", label: "G1 · Target pattern cleared" },
+  { id: "G2_PRESERVATION", label: "G2 · Protected values preserved" },
+  { id: "G3_BUILD", label: "G3 · Project builds" },
+  { id: "G4_RUNTIME", label: "G4 · Browser behavior checked" },
+  { id: "G5_NO_REGRESSION", label: "G5 · No new findings" },
 ];
 
 type DisplayStatus = "pending" | "pass" | "fail" | "not_run";

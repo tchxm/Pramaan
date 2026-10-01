@@ -19,6 +19,5 @@
     "noEmit": false,
     "types": ["vite/client"]
   },
-  "include": ["src"],
-  "references": [{ "path": "../core" }]
+  "include": ["src"]
 }

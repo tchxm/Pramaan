@@ -1,4 +1,4 @@
-import type { TraceEvent } from "@pramaan/core";
+import type { TraceEvent } from "../../types/core";
 import { ProvenanceChip, type ProvenanceActor } from "./ProvenanceChip.js";
 import "../../styles/workspace.css";
 

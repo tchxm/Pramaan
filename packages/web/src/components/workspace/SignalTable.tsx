@@ -1,7 +1,7 @@
 // SignalTable — spec Section 18.4. Renders the deterministic Signal[]
 // computed by the engine for a finding. `fired` is shown as an icon plus
 // text (never color alone, spec 18.8).
-import type { Signal } from "@pramaan/core";
+import type { Signal } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface SignalTableProps {

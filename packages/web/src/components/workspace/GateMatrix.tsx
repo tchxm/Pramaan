@@ -1,4 +1,4 @@
-import type { Finding, GateId, VerifyResult } from "@pramaan/core";
+import type { Finding, GateId, VerifyResult } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface GateMatrixProps {

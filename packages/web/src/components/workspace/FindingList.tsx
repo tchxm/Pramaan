@@ -1,5 +1,6 @@
-import type { Finding, Severity } from "@pramaan/core";
+import type { Finding, Severity } from "../../types/core";
 import { StatusPill } from "./StatusPill";
+import { reviewLabel } from "./FindingJourney";
 import "../../styles/workspace.css";
 
 export interface FindingListProps {
@@ -52,7 +53,7 @@ export function FindingList({ findings, selectedId, onSelect, progressLabels }: 
               <span className={`ws-finding-row__severity ws-finding-row__severity--${f.severity}`}>
                 {SEVERITY_LABEL[f.severity]}
               </span>
-              <StatusPill status={f.status} />
+              <StatusPill status={f.status} label={reviewLabel(f, progressLabels?.[f.findingId] === "Stopped at proposal")} />
             </span>
             {progressLabels?.[f.findingId] && <span className="ws-finding-row__progress">{progressLabels[f.findingId]}</span>}
           </button>

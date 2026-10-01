@@ -22,7 +22,7 @@
 // invariant I-07. It is rendered only through JSX text interpolation
 // (which escapes it), never via dangerouslySetInnerHTML.
 import { useMemo } from "react";
-import type { Finding } from "@pramaan/core";
+import type { Finding } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface EvidencePanelProps {

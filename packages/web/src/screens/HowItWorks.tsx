@@ -18,7 +18,7 @@
 //     re-verifiable at /verify (S5Verify), packages/core/src/evidence/*.
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { DISCLAIMER } from "@pramaan/core/constants";
+import { DISCLAIMER } from "../constants";
 import AppShell from "../components/shell/AppShell.js";
 import "../styles/landing.css";
 import "../styles/howitworks.css";

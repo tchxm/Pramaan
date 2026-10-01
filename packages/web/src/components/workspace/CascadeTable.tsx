@@ -2,7 +2,7 @@
 // the engine resolved for a CSS_CASCADE finding (Section 9.4), with the
 // winning declaration visually marked (left accent bar + "winner" badge),
 // never by color alone.
-import type { CascadeEntry } from "@pramaan/core";
+import type { CascadeEntry } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface CascadeTableProps {

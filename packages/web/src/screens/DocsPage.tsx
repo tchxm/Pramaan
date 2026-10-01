@@ -4,7 +4,7 @@
 // operations, G1-G5 gate semantics, and the architecture layering are the
 // same facts HowItWorks.tsx and the engine itself already assert.
 import { Link } from "react-router-dom";
-import { DISCLAIMER } from "@pramaan/core/constants";
+import { DISCLAIMER } from "../constants";
 import AppShell from "../components/shell/AppShell.js";
 import "../styles/landing.css";
 import "../styles/howitworks.css";

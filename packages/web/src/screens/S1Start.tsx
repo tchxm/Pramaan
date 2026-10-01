@@ -18,7 +18,7 @@ import { ErrorState } from "../components/workspace/ErrorState.js";
 import AppShell from "../components/shell/AppShell.js";
 import "../styles/workspace.css";
 import "../styles/screens.css";
-import { DISCLAIMER } from "@pramaan/core/constants";
+import { DISCLAIMER } from "../constants";
 
 type LoadState = "loading" | "ready" | "error";
 

@@ -3,7 +3,7 @@
 // shown unless `verifiedAgainstGazette` is true; otherwise the exact copy
 // from spec 18.6 is shown so nobody mistakes an unverified paraphrase for
 // a checked legal citation.
-import type { RegulationRef } from "@pramaan/core";
+import type { RegulationRef } from "../../types/core";
 import "../../styles/workspace.css";
 
 export interface RegulationBasisProps {

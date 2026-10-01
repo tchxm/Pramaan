@@ -5,7 +5,7 @@
 // generically, so we hand-roll a small fetch+ReadableStream-based client that
 // gives us full control over reconnect backoff and event framing while
 // keeping the same on-the-wire SSE protocol the server speaks.
-import type { TraceEvent } from "@pramaan/core";
+import type { TraceEvent } from "../types/core";
 
 export interface AuditSnapshotPayload {
   audit: unknown;

@@ -7,7 +7,7 @@
 //   3. A dropped connection never erases visible state — it shows a
 //      "reconnecting" banner and keeps the last known data on screen.
 import { create } from "zustand";
-import type { Audit, Finding, VerifyResult, PatchProposal, ApprovalRequest, TraceEvent } from "@pramaan/core";
+import type { Audit, Finding, VerifyResult, PatchProposal, ApprovalRequest, TraceEvent } from "../types/core";
 import { subscribeToAuditEvents, type AuditSnapshotPayload } from "../api/sse.js";
 import { eventsUrl } from "../api/client.js";
 

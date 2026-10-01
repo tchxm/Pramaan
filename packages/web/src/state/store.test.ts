@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
-import type { TraceEvent } from "@pramaan/core";
+import type { TraceEvent } from "../types/core";
 import type { SseHandlers } from "../api/sse.js";
 const captured = vi.hoisted(() => ({ handlers: null as SseHandlers | null }));
 vi.mock("../api/sse.js", () => ({ subscribeToAuditEvents: (_url: string, handlers: SseHandlers) => {
