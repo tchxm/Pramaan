@@ -613,7 +613,7 @@
 }
 
 .ws-approval-drawer__btn--primary:hover:not(:disabled) {
-  background: #1f2e3d;
+  background: var(--tag);
 }
 
 .ws-approval-drawer__btn--danger {

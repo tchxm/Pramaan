@@ -4,27 +4,20 @@ const TYPEWRITER_COPY =
   "Give it a frontend. PRAMAAN finds deceptive UI patterns, proposes bounded fixes, verifies every change with a deterministic engine, and leaves the evidence behind.";
 
 /**
- * Blurred intro label + typewriter line. Copy is verbatim from spec
- * Sections 9.6 / 9.7 — do not paraphrase.
+ * Hero headline + typewriter line. Headline copy is new for this redesign;
+ * the typewriter copy is kept close to the original (spec 9.6/9.7's voice).
  */
 export default function HeroIntro() {
   return (
     <div>
-      <p
-        className="select-none font-normal leading-[1.3] text-white [filter:blur(4px)] [font-size:clamp(18px,4vw,26px)]"
-        style={{ pointerEvents: "none" }}
-      >
-        Meet PRAMAAN,
+      <p className="lp-eyebrow">Agentic dark-pattern audit</p>
+      <h1 className="lp-headline">
+        Meet PRAMAAN.
         <br />
-        a deceptive-interface remediation and evidence engine
-      </p>
+        It reads your interface <em>the way a regulator would</em> — then fixes what it finds, and proves it.
+      </h1>
 
-      <TypewriterLine
-        text={TYPEWRITER_COPY}
-        speed={38}
-        startDelay={600}
-        className="mt-6 text-base leading-relaxed text-white sm:text-lg"
-      />
+      <TypewriterLine text={TYPEWRITER_COPY} speed={38} startDelay={600} className="lp-lede" />
     </div>
   );
 }

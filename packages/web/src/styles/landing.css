@@ -1,6 +1,273 @@
-/* Styles that are impractical to express as Tailwind utilities alone:
-   the typewriter's blinking caret keyframes. Everything else in the
-   landing layer is built with Tailwind utility classes. */
+/* Landing page — dark evidence-grade editorial. Plain CSS against the same
+   tokens the rest of the app uses (global.css), replacing the previous
+   Tailwind-utility-only approach so landing and app share one visual
+   language instead of feeling like two different products. */
+
+.lp-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--bench);
+  color: var(--ink);
+}
+
+.lp-hero-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- Nav ---------- */
+
+.lp-nav {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 30;
+  padding: var(--space-4) var(--space-5);
+  background: linear-gradient(to bottom, rgba(11, 12, 10, 0.85), transparent);
+}
+
+.lp-nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.lp-brand {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.lp-brand span {
+  color: var(--tag);
+  margin-left: 2px;
+}
+
+.lp-nav__links {
+  display: none;
+  align-items: center;
+  gap: var(--space-6);
+  font-size: var(--text-base);
+  color: var(--slate);
+}
+
+.lp-nav__links a {
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
+.lp-nav__links a:hover {
+  color: var(--ink);
+}
+
+.lp-nav__cta {
+  display: none;
+}
+
+.lp-hamburger {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  height: 24px;
+  width: 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.lp-hamburger span {
+  display: block;
+  height: 2px;
+  width: 24px;
+  background: var(--ink);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .lp-nav__links,
+  .lp-nav__cta {
+    display: flex;
+  }
+  .lp-hamburger {
+    display: none;
+  }
+}
+
+/* ---------- Mobile nav overlay ---------- */
+
+.lp-mobile-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: 0 var(--space-5);
+  background: rgba(11, 12, 10, 0.94);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.lp-mobile-nav--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lp-mobile-nav a,
+.lp-mobile-nav button {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  color: var(--ink);
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.lp-mobile-nav__cta {
+  margin-top: var(--space-4);
+  color: var(--tag);
+}
+
+@media (min-width: 768px) {
+  .lp-mobile-nav {
+    display: none;
+  }
+}
+
+/* ---------- Hero ---------- */
+
+.lp-hero {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 var(--space-5) var(--space-7);
+}
+
+@media (min-width: 768px) {
+  .lp-hero {
+    justify-content: center;
+    padding-bottom: 0;
+    padding-inline: var(--space-8);
+  }
+}
+
+.lp-hero__content {
+  max-width: 720px;
+}
+
+.lp-eyebrow {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--tag);
+  margin: 0 0 var(--space-3);
+}
+
+.lp-headline {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(32px, 5.2vw, 56px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--space-5);
+  color: var(--ink);
+}
+
+.lp-headline em {
+  font-style: italic;
+  color: var(--tag);
+}
+
+.lp-lede {
+  max-width: 54ch;
+  color: var(--slate);
+  font-size: var(--text-md);
+  line-height: 1.65;
+  margin: 0;
+  min-height: 3.3em;
+}
+
+/* ---------- Action pills ---------- */
+
+.lp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-2);
+  margin-top: var(--space-6);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.lp-actions--visible {
+  opacity: 1;
+  transform: none;
+}
+
+.lp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 3px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.lp-pill:hover {
+  border-color: var(--tag);
+  color: var(--tag);
+}
+
+.lp-pill--primary {
+  background: var(--ink);
+  color: var(--bench);
+  border-color: var(--ink);
+}
+
+.lp-pill--primary:hover {
+  background: var(--tag);
+  border-color: var(--tag);
+  color: var(--bench);
+}
+
+.lp-pill--ghost {
+  background: transparent;
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-actions {
+    transition: none;
+  }
+}
+
+/* ---------- Typewriter caret ---------- */
 
 @keyframes pramaan-caret-blink {
   0%,
@@ -18,7 +285,7 @@
   width: 2px;
   height: 1.1em;
   vertical-align: text-bottom;
-  background-color: #ffffff;
+  background-color: var(--ink);
   margin-left: 1px;
   animation: pramaan-caret-blink 1s step-end infinite;
 }

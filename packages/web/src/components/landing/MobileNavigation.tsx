@@ -10,8 +10,7 @@ interface MobileNavigationProps {
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Full-viewport mobile nav overlay. Handles the full accessibility
- * checklist from spec Section 9.5: real <button>s, aria-expanded /
+ * Full-viewport mobile nav overlay. Real <button>s, aria-expanded /
  * aria-controls (wired by the caller via `id`), Escape-to-close, a focus
  * trap while open, body scroll lock, and returning focus to the hamburger
  * on close (the caller owns that last step since it owns the button ref).
@@ -72,38 +71,20 @@ export default function MobileNavigation({ id, open, onClose, onNavigate }: Mobi
       aria-modal="true"
       aria-label="Site navigation"
       aria-hidden={!open}
-      className={`fixed inset-0 z-40 flex flex-col items-start justify-center gap-7 bg-black/90 px-8 backdrop-blur-[8px] transition-opacity duration-300 md:hidden ${
-        open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-      }`}
+      className={`lp-mobile-nav${open ? " lp-mobile-nav--open" : ""}`}
     >
-      <a
-        href="#how-it-works"
-        onClick={onClose}
-        className="text-2xl text-white [font-family:var(--font-heading)]"
-      >
+      <a href="#how-it-works" onClick={onClose}>
         How it works
       </a>
-      <button
-        type="button"
-        onClick={() => onNavigate("/verify")}
-        className="text-left text-2xl text-white [font-family:var(--font-heading)]"
-      >
+      <button type="button" onClick={() => onNavigate("/verify")}>
         Evidence
       </button>
       {/* No docs site exists yet; scroll to the in-page explanation instead
           of linking to a fabricated external URL. */}
-      <a
-        href="#how-it-works"
-        onClick={onClose}
-        className="text-2xl text-white [font-family:var(--font-heading)]"
-      >
+      <a href="#how-it-works" onClick={onClose}>
         Documentation
       </a>
-      <button
-        type="button"
-        onClick={() => onNavigate("/audit")}
-        className="mt-4 text-left text-2xl text-white [font-family:var(--font-heading)]"
-      >
+      <button type="button" className="lp-mobile-nav__cta" onClick={() => onNavigate("/audit")}>
         Start an audit
       </button>
     </div>
