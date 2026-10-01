@@ -1,29 +1,23 @@
 import "../../styles/landing.css";
 import BootGate from "./BootGate.js";
-import HeroGlobe from "./HeroGlobe.js";
 import AppShell from "../shell/AppShell.js";
-import HeroIntro from "./HeroIntro.js";
-import HeroActions from "./HeroActions.js";
+import HeroStory from "./story/HeroStory.js";
 
 /**
- * PRAMAAN landing hero. Dark, evidence-grade editorial — serif headline,
- * mono data texture, warm gold accent — carried by typography and a
- * lightweight reactive canvas backdrop, not feature cards or dashboards.
+ * PRAMAAN landing page. The boot gate (unchanged — one real ceremony,
+ * shown once per session) hands off into a 5-beat scroll story: IDENTIFY,
+ * DETECT, INVESTIGATE, VERIFY, PROVE (spec section 14). HeroStory owns its
+ * own full-viewport 3D stage; this component just sequences gate → shell →
+ * story.
  */
 export default function LandingPage() {
   return (
     <div className="lp-page">
       <BootGate />
-      <HeroGlobe />
 
       <AppShell variant="transparent" />
 
-      <section id="how-it-works" className="lp-hero">
-        <div className="lp-hero__content">
-          <HeroIntro />
-          <HeroActions />
-        </div>
-      </section>
+      <HeroStory />
     </div>
   );
 }

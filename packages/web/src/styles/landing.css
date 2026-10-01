@@ -4,21 +4,16 @@
    language instead of feeling like two different products. */
 
 .lp-page {
+  /* No overflow:hidden here — HeroStory's pinned stage relies on
+     position:sticky, which an ancestor's non-visible overflow breaks. The
+     old static hero's fixed canvas (which this rule used to contain) is
+     gone; HeroStory owns its own canvas inside its own sticky stage now. */
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
   background: var(--bench);
   color: var(--ink);
 }
 
-.lp-hero-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
 
 /* ---------- Nav ---------- */
 
@@ -150,29 +145,9 @@
   }
 }
 
-/* ---------- Hero ---------- */
-
-.lp-hero {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 var(--space-5) var(--space-7);
-}
-
-@media (min-width: 768px) {
-  .lp-hero {
-    justify-content: center;
-    padding-bottom: 0;
-    padding-inline: var(--space-8);
-  }
-}
-
-.lp-hero__content {
-  max-width: 720px;
-}
+/* ---------- Hero text (used inside HeroStory's beats — see story.css for
+   the layout that positions them; these are the shared type rules
+   HeroIntro/HeroActions use regardless of which beat/layout hosts them) ---------- */
 
 .lp-eyebrow {
   font-family: var(--ws-mono, "JetBrains Mono", monospace);

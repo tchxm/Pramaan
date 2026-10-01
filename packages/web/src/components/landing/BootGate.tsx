@@ -78,10 +78,10 @@ export default function BootGate() {
 
   function dismiss() {
     if (entering || closing) return;
-    // Robot-to-globe handoff: dolly the robot's camera through its visor,
-    // flash at the peak, then wipe the gate away — HeroGlobe is already
-    // rendering underneath, so the flash is what sells the cut as one
-    // continuous push rather than two unrelated 3D scenes swapping places.
+    // Robot-to-story handoff: dolly the robot's camera through its visor,
+    // flash at the peak, then wipe the gate away — HeroStory's own scene is
+    // already rendering underneath, so the flash is what sells the cut as
+    // one continuous push rather than two unrelated 3D scenes swapping.
     setEntering(true);
     window.setTimeout(() => setFlash(true), 560);
     window.setTimeout(() => {

@@ -50,7 +50,8 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
     rim.position.set(3, -1, -2.5);
     scene.add(rim);
 
-    // Soft warm backlight glow (canvas sprite, same technique as HeroGlobe)
+    // Soft warm backlight glow (canvas sprite, same technique as the
+    // network scene behind this gate)
     const glowCanvas = document.createElement("canvas");
     glowCanvas.width = 256;
     glowCanvas.height = 256;
@@ -284,9 +285,9 @@ export default function BootRobot({ entering = false }: { entering?: boolean }) 
       // Idle motion: almost invisible vertical drift, nothing more.
       root.position.y = reducedMotion || isEntering ? root.position.y * 0.9 : Math.sin(t * 0.7) * 0.02;
 
-      // "Enter" dollies the camera into the screen — the robot-to-globe
+      // "Enter" dollies the camera into the screen — the robot-to-story
       // handoff. BootGate flashes at the peak, then unmounts this scene to
-      // reveal HeroGlobe already rendering behind it.
+      // reveal HeroStory's own scene already rendering behind it.
       const targetZ = isEntering ? 1.3 : 7.2;
       const targetY2 = isEntering ? headBaseY + root.position.y : 0.25;
       const targetFov = isEntering ? 56 : 26;

@@ -1,0 +1,193 @@
+/* Home page 5-beat scroll story. Pinned-stage scrollytelling: a tall
+   .story section whose inner .story__stage sticks to the viewport while
+   the user scrolls through it; beat opacity/camera are driven imperatively
+   from HeroStory.tsx's rAF loop (see that file), not React state or CSS
+   scroll-timeline (broader browser support). */
+
+.story {
+  position: relative;
+  height: 560vh;
+}
+
+.story__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bench);
+}
+
+.story__canvas-mount {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.story__beat {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s linear;
+}
+
+@media (min-width: 768px) {
+  .story__beat {
+    padding-inline: var(--space-8);
+  }
+}
+
+.story__beat-inner {
+  max-width: 640px;
+}
+
+.story__beat--4 .story__beat-inner,
+.story__beat--5 .story__beat-inner {
+  max-width: 560px;
+}
+
+.story__eyebrow {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  color: var(--tag);
+  margin: 0 0 var(--space-3);
+}
+
+.story__h2 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: clamp(28px, 4.4vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--space-4);
+  color: var(--ink);
+}
+
+.story__p {
+  max-width: 54ch;
+  color: var(--slate);
+  font-size: var(--text-md);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.story__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.story__badge {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--ink);
+  background: var(--panel-raised);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 6px 10px;
+}
+
+.story__rail {
+  margin-top: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.story__rail-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--panel-raised);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.story__rail-id {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+  color: var(--tag);
+  min-width: 28px;
+}
+
+.story__rail-label {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.story__rail-verdict {
+  margin-top: var(--space-2);
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--verified);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--verified);
+  border-radius: 6px;
+  box-shadow: var(--glow);
+}
+
+.story__evidence-list {
+  margin: var(--space-5) 0 var(--space-6);
+  padding-left: 1.2em;
+  color: var(--slate);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.story__evidence-list li::marker {
+  color: var(--tag);
+}
+
+.story__scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-6);
+  transform: translateX(-50%);
+  z-index: 3;
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  color: var(--slate);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .story__scroll-hint {
+    animation: story-hint-bob 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes story-hint-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 6px); }
+}
+
+/* ---------- Simple (reduced-motion / narrow viewport) fallback ---------- */
+
+.story--simple {
+  height: auto;
+}
+
+.story__simple-beat {
+  padding: var(--space-8) var(--space-5);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.story__simple-beat--1 {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.story__simple-beat .story__rail--simple {
+  margin-top: var(--space-5);
+}
