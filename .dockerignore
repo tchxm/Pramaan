@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+**/dist
+**/dist-types
+**/build
+.git
+.pramaan
+packages/web/qa
+packages/web/public/.vite
+.env
+*.tsbuildinfo

@@ -16,10 +16,23 @@ export async function buildApp(options: BuildAppOptions = {}) {
   const app = Fastify({ logger: true });
   // Vite picks the next free port when 5173 is taken (5174, 5175, ...), so
   // pinning to one origin breaks the whole app with an opaque CORS failure
-  // the moment a stray dev server is already running on 5173. This is a
-  // local hackathon tool, not a deployed service — any localhost/127.0.0.1
-  // origin is safe to allow.
-  await app.register(cors, { origin: /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/ });
+  // the moment a stray dev server is already running on 5173 — any
+  // localhost/127.0.0.1 origin is safe to allow for local dev. A deployed
+  // frontend origin is added via PRAMAAN_ALLOWED_ORIGIN (comma-separated).
+  const localOrigin = /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/;
+  const extraOrigins = (process.env.PRAMAAN_ALLOWED_ORIGIN ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  await app.register(cors, {
+    origin: (origin, cb) => {
+      if (!origin || localOrigin.test(origin) || extraOrigins.includes(origin)) {
+        cb(null, true);
+        return;
+      }
+      cb(new Error("Not allowed by CORS"), false);
+    },
+  });
 
   registerErrorHandler(app);
 
