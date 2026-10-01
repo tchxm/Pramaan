@@ -16,7 +16,7 @@ import {
 } from "@pramaan/core";
 import { runAudit, type RunAuditIO } from "@pramaan/agent";
 import { nextAuditId } from "./counter.js";
-import { randomSecret, mintApprovalToken } from "./security.js";
+import { randomSecret, mintApprovalToken, mintApprovalTokenFromHash, verifyApprovalTokenFromHash } from "./security.js";
 
 export const ENGINE_VERSION = "0.1.0";
 
@@ -235,6 +235,15 @@ export class AuditStore {
           }
           record.pendingApprovalResolvers.set(approvalId, resolve);
         }),
+      // Wire the server's REAL per-audit HMAC secret (record.secret) into
+      // the agent's approval handshake, so a token minted here is the one
+      // actually checked by patch/policy's P6 inside applyPatch — instead
+      // of the agent package's local in-process fallback secret. Spec 14.9 /
+      // I-06: the agent never sees the secret, only these two functions.
+      mintApprovalToken: (info) =>
+        mintApprovalTokenFromHash(record.secret, info.auditId, info.findingId, info.proposalId, info.textSha256),
+      verifyApprovalToken: (token, info) =>
+        verifyApprovalTokenFromHash(record.secret, token, info.auditId, info.findingId, info.proposalId, info.textSha256),
     };
 
     try {

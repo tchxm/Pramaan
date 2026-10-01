@@ -62,8 +62,40 @@ export function mintApprovalToken(
   proposalId: string,
   to: string,
 ): string {
-  const toHash = sha256Hex(to);
+  return mintApprovalTokenFromHash(secret, auditId, findingId, proposalId, sha256Hex(to));
+}
+
+/**
+ * Same HMAC as mintApprovalToken, but takes an already-computed
+ * sha256(to) directly — this is the shape @pramaan/agent's
+ * `ApprovalTokenInfo` carries (`textSha256`), since the agent package
+ * never needs the raw replacement text itself, only its hash. Exact same
+ * algorithm as the duplicate in packages/agent/src/approvals.ts's
+ * `hmacToken` (deliberately duplicated there so agent never depends on
+ * server) — keep both in sync if this ever changes.
+ */
+export function mintApprovalTokenFromHash(
+  secret: Buffer,
+  auditId: string,
+  findingId: string,
+  proposalId: string,
+  textSha256: string,
+): string {
   return createHmac("sha256", secret)
-    .update(`${auditId}:${findingId}:${proposalId}:${toHash}`)
+    .update(`${auditId}:${findingId}:${proposalId}:${textSha256}`)
     .digest("hex");
+}
+
+/** Constant-time-ish verification (relies on string equality; token space is
+ * a 256-bit HMAC so timing leakage here is not a practical concern for a
+ * local-demo-scoped server, per spec 17.4's security posture). */
+export function verifyApprovalTokenFromHash(
+  secret: Buffer,
+  token: string,
+  auditId: string,
+  findingId: string,
+  proposalId: string,
+  textSha256: string,
+): boolean {
+  return token === mintApprovalTokenFromHash(secret, auditId, findingId, proposalId, textSha256);
 }
