@@ -24,6 +24,12 @@ export interface LLMMessage {
   toolCallId?: string;
   /** Present on role:"tool" messages: the name of the tool that was called. */
   toolName?: string;
+  /** Present on role:"assistant" messages that made tool calls: the calls
+   * themselves, so an adapter can reconstruct the provider's native
+   * tool_use/tool_calls representation on replay. Required for providers
+   * (Anthropic, OpenAI-compatible) that reject a `tool_result` with no
+   * preceding matching tool-call block in the same conversation. */
+  toolCalls?: LLMToolCall[];
 }
 
 /** A tool call the model made during a `complete` turn. */
@@ -31,6 +37,12 @@ export interface LLMToolCall {
   id: string;
   name: string;
   input: unknown;
+  /** Opaque provider-specific data that MUST be echoed back verbatim on the
+   * next turn's reconstructed assistant message (e.g. Gemini's
+   * `extra_content.google.thought_signature`, which it rejects a follow-up
+   * tool_result without). Adapters that don't need this leave it undefined;
+   * adapters that do must round-trip it without interpreting it. */
+  providerExtra?: unknown;
 }
 
 /** The normalized result of one `complete` call, independent of provider. */

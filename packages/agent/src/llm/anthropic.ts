@@ -14,6 +14,7 @@ import type {
   LLMToolDefinition,
 } from "./client.js";
 import { LLMTimeoutError, LLMUnavailableError } from "./client.js";
+import { toApiToolName, fromApiToolName } from "./toolName.js";
 
 const DEFAULT_MAX_TOKENS = 4096;
 const DEFAULT_TEMPERATURE = 0;
@@ -64,6 +65,18 @@ function toAnthropicRequest(messages: LLMMessage[]): {
       });
       continue;
     }
+    if (m.role === "assistant" && m.toolCalls && m.toolCalls.length > 0) {
+      // Reconstruct the tool_use blocks the model actually emitted, so a
+      // later tool_result has a matching block to attach to (Anthropic
+      // rejects an orphaned tool_result otherwise).
+      const content: Array<Anthropic.TextBlockParam | Anthropic.ToolUseBlockParam> = [];
+      if (m.content) content.push({ type: "text", text: m.content });
+      for (const call of m.toolCalls) {
+        content.push({ type: "tool_use", id: call.id, name: toApiToolName(call.name), input: call.input as Record<string, unknown> });
+      }
+      anthropicMessages.push({ role: "assistant", content });
+      continue;
+    }
     anthropicMessages.push({ role: m.role, content: m.content });
   }
 
@@ -75,7 +88,7 @@ function toAnthropicRequest(messages: LLMMessage[]): {
 
 function toAnthropicTools(tools: LLMToolDefinition[]): Anthropic.Tool[] {
   return tools.map((t) => ({
-    name: t.name,
+    name: toApiToolName(t.name),
     description: t.description,
     input_schema: t.inputSchema as Anthropic.Tool.InputSchema,
   }));
@@ -104,7 +117,7 @@ function toLLMResponse(message: Anthropic.Message): LLMResponse {
     if (block.type === "text") {
       text += block.text;
     } else if (block.type === "tool_use") {
-      toolCalls.push({ id: block.id, name: block.name, input: block.input });
+      toolCalls.push({ id: block.id, name: fromApiToolName(block.name), input: block.input });
     }
   }
   return {
@@ -124,6 +137,13 @@ export class AnthropicLLMClient implements LLMClient {
   private readonly client: Anthropic;
   private readonly model: string;
 
+  /** See the matching comment in openaiCompatible.ts — short, bounded
+   * retries for transient rate-limit/server errors before burning the
+   * fallback chain's one-shot failover on something that would likely have
+   * cleared on its own within a few seconds. */
+  private static readonly MAX_RETRIES = 2;
+  private static readonly RETRY_DELAY_MS = [2000, 5000];
+
   constructor(options: AnthropicClientOptions) {
     if (!options.apiKey) {
       throw new LLMUnavailableError(
@@ -134,10 +154,15 @@ export class AnthropicLLMClient implements LLMClient {
     this.model = options.model ?? process.env.PRAMAAN_MODEL ?? DEFAULT_ANTHROPIC_MODEL;
   }
 
+  private isTransient(err: unknown): boolean {
+    return err instanceof Anthropic.RateLimitError || err instanceof Anthropic.InternalServerError;
+  }
+
   async complete(
     messages: LLMMessage[],
     tools: LLMToolDefinition[],
     options?: LLMCompleteOptions,
+    attempt = 0,
   ): Promise<LLMResponse> {
     const { system, anthropicMessages } = toAnthropicRequest(messages);
     const anthropicTools = toAnthropicTools(tools);
@@ -158,6 +183,12 @@ export class AnthropicLLMClient implements LLMClient {
       );
       return toLLMResponse(message);
     } catch (err) {
+      if (this.isTransient(err) && attempt < AnthropicLLMClient.MAX_RETRIES) {
+        const delayMs = AnthropicLLMClient.RETRY_DELAY_MS[attempt] ?? 5000;
+        console.error(`[pramaan/llm] Anthropic transient error, retrying in ${delayMs}ms (attempt ${attempt + 1}/${AnthropicLLMClient.MAX_RETRIES})`);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        return this.complete(messages, tools, options, attempt + 1);
+      }
       throw this.mapError(err, controller.signal.aborted);
     } finally {
       clearTimeout(timer);

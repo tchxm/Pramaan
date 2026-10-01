@@ -47,7 +47,7 @@ describe("AnthropicLLMClient", () => {
       stop_sequence: null,
       content: [
         { type: "text", text: "Let me check." },
-        { type: "tool_use", id: "tool_1", name: "css.cascade", input: { fingerprint: "abc" } },
+        { type: "tool_use", id: "tool_1", name: "css__cascade", input: { fingerprint: "abc" } },
       ],
       usage: { input_tokens: 10, output_tokens: 5 },
     });
@@ -66,7 +66,7 @@ describe("AnthropicLLMClient", () => {
     expect(callArgs.temperature).toBe(0);
     expect(callArgs.system).toBe("You are the agent.");
     expect(callArgs.tools).toEqual([
-      { name: "css.cascade", description: "Cascade trace", input_schema: { type: "object" } },
+      { name: "css__cascade", description: "Cascade trace", input_schema: { type: "object" } },
     ]);
     expect(callArgs.messages).toEqual([{ role: "user", content: "Investigate finding PRM-001." }]);
 

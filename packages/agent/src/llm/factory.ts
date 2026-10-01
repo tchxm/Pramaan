@@ -12,6 +12,7 @@ import { AnthropicLLMClient } from "./anthropic.js";
 import type { LLMClient, LLMCompleteOptions, LLMMessage, LLMResponse, LLMToolDefinition } from "./client.js";
 import { LLMUnavailableError } from "./client.js";
 import { createFallbackClient } from "./fallback.js";
+import { GeminiLLMClient } from "./gemini.js";
 import { GroqLLMClient } from "./groq.js";
 
 /**
@@ -26,6 +27,13 @@ function resolveAnthropicKey(): string | undefined {
 
 function resolveGroqKey(): string | undefined {
   return process.env.GROQ_API_KEY || undefined;
+}
+
+/** Free-tier, no-credit-card provider. Spec 6.1 doesn't name this env var
+ * (added after the spec was written, as a genuinely free fallback option);
+ * `GEMINI_API_KEY` is the conventional name, `GOOGLE_API_KEY` also accepted. */
+function resolveGeminiKey(): string | undefined {
+  return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || undefined;
 }
 
 /** Placeholder client used when neither provider is configured. Constructing
@@ -49,28 +57,34 @@ class UnconfiguredLLMClient implements LLMClient {
 }
 
 /**
- * Builds the default `LLMClient` for live mode: Anthropic primary, Groq
- * fallback, wired through `createFallbackClient`. Safe to call with no
- * keys configured — it returns a client whose calls fail loudly and
- * clearly, rather than throwing at construction time.
+ * Builds the default `LLMClient` for live mode: tries each configured
+ * provider in priority order — Anthropic, then Gemini (free tier), then
+ * Groq (free tier) — wired through nested `createFallbackClient` calls.
+ * Any subset of keys may be set; unset providers are simply skipped. Safe
+ * to call with no keys configured — it returns a client whose calls fail
+ * loudly and clearly, rather than throwing at construction time.
  */
 export function createDefaultLLMClient(): LLMClient {
+  const providers: Array<{ name: string; client: LLMClient }> = [];
+
   const anthropicKey = resolveAnthropicKey();
+  if (anthropicKey) providers.push({ name: "anthropic", client: new AnthropicLLMClient({ apiKey: anthropicKey }) });
+
+  const geminiKey = resolveGeminiKey();
+  if (geminiKey) providers.push({ name: "gemini", client: new GeminiLLMClient({ apiKey: geminiKey }) });
+
   const groqKey = resolveGroqKey();
+  if (groqKey) providers.push({ name: "groq", client: new GroqLLMClient({ apiKey: groqKey }) });
 
-  const primary = anthropicKey ? new AnthropicLLMClient({ apiKey: anthropicKey }) : null;
-  const secondary = groqKey ? new GroqLLMClient({ apiKey: groqKey }) : null;
+  if (providers.length === 0) return new UnconfiguredLLMClient();
 
-  if (primary && secondary) {
-    return createFallbackClient(primary, secondary, { primary: "anthropic", secondary: "groq" });
+  // Fold right-to-left: the last provider stands alone, each one before it
+  // becomes the primary of a fallback pair wrapping everything after it.
+  let chain = providers[providers.length - 1]!.client;
+  let chainName = providers[providers.length - 1]!.name;
+  for (let i = providers.length - 2; i >= 0; i -= 1) {
+    chain = createFallbackClient(providers[i]!.client, chain, { primary: providers[i]!.name, secondary: chainName });
+    chainName = `${providers[i]!.name}->${chainName}`;
   }
-  if (primary) {
-    return createFallbackClient(primary, null, { primary: "anthropic" });
-  }
-  if (secondary) {
-    // Groq as the sole configured provider: it is "primary" from the
-    // caller's perspective since it's the only one that will ever run.
-    return createFallbackClient(secondary, null, { primary: "groq" });
-  }
-  return new UnconfiguredLLMClient();
+  return chain;
 }

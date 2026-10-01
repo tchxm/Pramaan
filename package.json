@@ -15,7 +15,7 @@
     "fixtures:build": "node ./scripts/build-fixtures.mjs",
     "e2e": "playwright test --config packages/web/playwright.config.ts",
     "demo": "node ./scripts/demo.mjs",
-    "pramaan": "node ./packages/cli/dist/index.js",
+    "pramaan": "node --env-file-if-exists=.env ./packages/cli/dist/index.js",
     "typecheck": "tsc -b tsconfig.base.json --verbose"
   },
   "devDependencies": {

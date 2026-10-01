@@ -65,7 +65,7 @@ export async function runAgentLoop(
     }
 
     trace.emit({ type: "agent.reason", actor: "agent", payload: { text: reply.text, stopReason: reply.stopReason } });
-    messages.push({ role: "assistant", content: reply.text });
+    messages.push({ role: "assistant", content: reply.text, toolCalls: reply.toolCalls });
 
     if (reply.toolCalls.length === 0) {
       if (allFindingsTerminal(ctx)) break;

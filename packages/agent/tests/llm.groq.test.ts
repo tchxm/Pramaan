@@ -35,7 +35,7 @@ describe("GroqLLMClient", () => {
                 {
                   id: "call_1",
                   type: "function",
-                  function: { name: "css.cascade", arguments: JSON.stringify({ fingerprint: "abc" }) },
+                  function: { name: "css__cascade", arguments: JSON.stringify({ fingerprint: "abc" }) },
                 },
               ],
             },
@@ -58,7 +58,7 @@ describe("GroqLLMClient", () => {
     expect(body.tools).toEqual([
       {
         type: "function",
-        function: { name: "css.cascade", description: "Cascade trace", parameters: { type: "object" } },
+        function: { name: "css__cascade", description: "Cascade trace", parameters: { type: "object" } },
       },
     ]);
     expect((init as RequestInit).headers).toMatchObject({ Authorization: "Bearer gsk_test_key" });
@@ -88,12 +88,14 @@ describe("GroqLLMClient", () => {
     await expect(client.complete([{ role: "user", content: "hi" }], [])).rejects.toThrow(LLMUnavailableError);
   });
 
-  it("throws LLMUnavailableError on 500", async () => {
+  it("throws LLMUnavailableError on 500 after exhausting transient-error retries", async () => {
     const fetchMock = globalThis.fetch as unknown as ReturnType<typeof vi.fn>;
     fetchMock.mockResolvedValue(new Response("server error", { status: 503 }));
     const client = new GroqLLMClient({ apiKey: "gsk_test_key" });
     await expect(client.complete([{ role: "user", content: "hi" }], [])).rejects.toThrow(LLMUnavailableError);
-  });
+    // 3 attempts total: the initial call plus 2 bounded retries.
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  }, 15000);
 
   it("throws LLMTimeoutError when fetch aborts", async () => {
     const fetchMock = globalThis.fetch as unknown as ReturnType<typeof vi.fn>;

@@ -151,7 +151,14 @@ export async function runAudit(options: RunAuditOptions, io: RunAuditIO): Promis
 
   const llmClient = options.llmClient ?? createDefaultLLMClient();
   const llmInfo = {
-    provider: process.env.LLM_API_KEY || process.env.ANTHROPIC_API_KEY ? "anthropic" : process.env.GROQ_API_KEY ? "groq" : "none",
+    provider:
+      process.env.LLM_API_KEY || process.env.ANTHROPIC_API_KEY
+        ? "anthropic"
+        : process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+          ? "gemini"
+          : process.env.GROQ_API_KEY
+            ? "groq"
+            : "none",
     model: process.env.PRAMAAN_MODEL ?? "unknown",
     temperature: 0,
     mode: (options.mode ?? "live") as "live" | "replay",

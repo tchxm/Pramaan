@@ -9,6 +9,9 @@ import {
   renderReportHtml,
   err,
   pathExists,
+  loadConfig,
+  buildProjectModel,
+  computeProtectedManifest,
   type EvidencePack,
 } from "@pramaan/core";
 import type { AuditStore } from "../store.js";
@@ -106,11 +109,23 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
   app.get("/api/audits/:id", async (request, reply) => {
     const { id } = request.params as { id: string };
     const record = requireAudit(store, id);
+    let protectedManifest: ReturnType<typeof computeProtectedManifest> = [];
+    try {
+      // Recomputed from the untouched baseline source (not the workspace,
+      // which may already carry applied patches by the time this is
+      // called) so it matches what runAudit used internally at audit start.
+      const configPath = record.options.configPath ?? path.join(record.sourceRoot, "pramaan.config.json");
+      const config = await loadConfig(configPath);
+      const model = await buildProjectModel(record.sourceRoot, config);
+      protectedManifest = computeProtectedManifest(model, config);
+    } catch (cause) {
+      request.log.warn({ auditId: id, cause }, "failed to recompute protectedManifest for GET /api/audits/:id");
+    }
     return {
       audit: record.audit,
       proposals: record.proposals,
       approvals: record.approvals,
-      protectedManifest: [], // patch/policy P-rules not implemented yet (A4)
+      protectedManifest,
     };
   });
 

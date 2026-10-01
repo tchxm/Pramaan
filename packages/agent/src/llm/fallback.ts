@@ -35,6 +35,20 @@ function describeFailure(providerName: string, err: unknown): string {
 }
 
 class FallbackLLMClient implements LLMClient {
+  /**
+   * Once `complete()` fails over to the secondary, every later call in this
+   * same conversation sticks to the secondary instead of retrying the
+   * primary. Retrying the primary mid-conversation would resend tool-call
+   * history the primary never produced itself — some providers (Gemini)
+   * reject that outright (a replayed function call missing its own
+   * provider-specific signature), and even where it's accepted, silently
+   * mixing providers' tool-call conventions inside one conversation is a
+   * correctness risk not worth taking. `completeJson` is single-shot/
+   * stateless (no replayed history), so it is NOT sticky — each call
+   * independently tries primary first.
+   */
+  private stickToSecondary = false;
+
   constructor(
     private readonly primary: LLMClient,
     private readonly primaryName: string,
@@ -47,6 +61,11 @@ class FallbackLLMClient implements LLMClient {
     tools: LLMToolDefinition[],
     options?: LLMCompleteOptions,
   ): Promise<LLMResponse> {
+    if (this.stickToSecondary && this.secondary) {
+      const result = await this.secondary.complete(messages, tools, options);
+      console.error(`[pramaan/llm] served by ${this.secondaryName} (sticky, after earlier ${this.primaryName} failure)`);
+      return result;
+    }
     try {
       const result = await this.primary.complete(messages, tools, options);
       console.error(`[pramaan/llm] served by ${this.primaryName}`);
@@ -66,6 +85,7 @@ class FallbackLLMClient implements LLMClient {
       try {
         const result = await this.secondary.complete(messages, tools, options);
         console.error(`[pramaan/llm] served by ${this.secondaryName} (after ${this.primaryName} failed)`);
+        this.stickToSecondary = true;
         return result;
       } catch (secondaryErr) {
         throw new LLMUnavailableError(
