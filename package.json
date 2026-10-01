@@ -1,0 +1,29 @@
+{
+  "name": "pramaan",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "fixtures/f*",
+    "fixtures/variants/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "vitest run",
+    "agent:test": "npm run build && node --experimental-vm-modules ./packages/agent/scripts/run-fixtures.mjs",
+    "fixtures:build": "node ./scripts/build-fixtures.mjs",
+    "e2e": "playwright test --config packages/web/playwright.config.ts",
+    "demo": "node ./scripts/demo.mjs",
+    "pramaan": "node ./packages/cli/dist/index.js",
+    "typecheck": "tsc -b tsconfig.base.json --verbose"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5",
+    "@playwright/test": "^1.46.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
