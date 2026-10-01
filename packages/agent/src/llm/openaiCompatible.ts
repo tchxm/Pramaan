@@ -23,8 +23,7 @@ const DEFAULT_TIMEOUT_MS = 30000;
 
 function redactKey(key: string | undefined): string {
   if (!key) return "(missing)";
-  if (key.length <= 8) return "***";
-  return `${key.slice(0, 4)}...${key.slice(-4)}`;
+  return "[REDACTED]";
 }
 
 interface OpenAIChatMessage {
@@ -198,7 +197,7 @@ export class OpenAICompatibleLLMClient implements LLMClient {
     }
 
     if (!response.ok) {
-      const text = await response.text().catch(() => "");
+      const text = (await response.text().catch(() => "")).split(this.apiKey).join("[REDACTED]");
       if (response.status === 401 || response.status === 403) {
         throw new LLMUnavailableError(
           `${this.providerLabel} authentication failed (key=${redactKey(this.apiKey)}, status=${response.status}): ${text}`,
@@ -206,7 +205,11 @@ export class OpenAICompatibleLLMClient implements LLMClient {
       }
       const isTransient = response.status === 429 || response.status >= 500;
       if (isTransient && attempt < OpenAICompatibleLLMClient.MAX_RETRIES) {
-        const delayMs = OpenAICompatibleLLMClient.RETRY_DELAY_MS[attempt] ?? 5000;
+        const retryHeader = response.headers.get("retry-after");
+        const seconds = retryHeader ? Number(retryHeader) : NaN;
+        const messageSeconds = Number(text.match(/try again in ([\d.]+)s/i)?.[1]);
+        const hintedMs = Number.isFinite(seconds) ? seconds * 1000 : Number.isFinite(messageSeconds) ? messageSeconds * 1000 : NaN;
+        const delayMs = Number.isFinite(hintedMs) ? Math.min(30000, Math.max(250, hintedMs + 250)) : OpenAICompatibleLLMClient.RETRY_DELAY_MS[attempt] ?? 5000;
         console.error(`[pramaan/llm] ${this.providerLabel} transient ${response.status}, retrying in ${delayMs}ms (attempt ${attempt + 1}/${OpenAICompatibleLLMClient.MAX_RETRIES})`);
         await new Promise((resolve) => setTimeout(resolve, delayMs));
         return this.post(body, timeoutMs, attempt + 1);
@@ -216,6 +219,9 @@ export class OpenAICompatibleLLMClient implements LLMClient {
       }
       if (response.status >= 500) {
         throw new LLMUnavailableError(`${this.providerLabel} server error (status=${response.status}): ${text}`);
+      }
+      if (response.status === 404 && /model/i.test(text)) {
+        throw new LLMUnavailableError(`${this.providerLabel} model unavailable (status=404)`);
       }
       // Other 4xx are content/request-shape errors, not provider-availability.
       throw new Error(`${this.providerLabel} request failed (status=${response.status}): ${text}`);
@@ -232,6 +238,9 @@ export class OpenAICompatibleLLMClient implements LLMClient {
 
   private toLLMResponse(json: any): LLMResponse {
     const choice = json?.choices?.[0];
+    if (!choice || !choice.message || typeof choice.message !== "object") {
+      throw new LLMUnavailableError(`${this.providerLabel} returned a malformed completion response`);
+    }
     const message = choice?.message ?? {};
     const text: string = typeof message.content === "string" ? message.content : "";
     const toolCalls: LLMToolCall[] = [];
@@ -258,7 +267,7 @@ export class OpenAICompatibleLLMClient implements LLMClient {
       text,
       toolCalls,
       stopReason: mapFinishReason(choice?.finish_reason),
-      raw: json,
+      raw: { ...json, pramaanProvider: this.providerLabel.toLowerCase() },
     };
   }
 }

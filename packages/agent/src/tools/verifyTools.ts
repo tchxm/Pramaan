@@ -148,7 +148,9 @@ export async function evidenceGenerateHandler(_input: unknown, ctx: AgentToolCon
   });
 
   const outDir = `${ctx.outDir}/${ctx.auditId}`;
-  const written = await writeReportBundle(pack, [], outDir);
+  // The pack commits to the chain prefix ending at traceHead. Subsequent
+  // evidence.generated/audit.completed events are outside that commitment.
+  const written = await writeReportBundle(pack, ctx.getTraceEvents?.() ?? [], outDir);
 
   ctx.evidenceResult = { packPath: written.packPath, evidenceHash: pack.evidenceHash };
   ctx.emit("evidence.generated", "engine", { packPath: written.packPath, evidenceHash: pack.evidenceHash });

@@ -39,11 +39,11 @@ export default function HeroActions() {
 
   return (
     <div className="lp-actions lp-actions--visible">
-      <button type="button" onClick={() => navigate("/audit")} className="lp-pill lp-pill--primary">
+      <button type="button" onClick={() => navigate("/audit")} className="lp-pill">
         Start an audit
       </button>
 
-      <button type="button" onClick={() => navigate("/demo")} className="lp-pill">
+      <button type="button" onClick={() => navigate("/demo")} className="lp-pill lp-pill--primary">
         Watch the demo
       </button>
 

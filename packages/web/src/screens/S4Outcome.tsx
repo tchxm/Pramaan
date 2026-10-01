@@ -12,6 +12,7 @@ import { OutcomeHero } from "../components/workspace/OutcomeHero.js";
 import { GateMatrix } from "../components/workspace/GateMatrix.js";
 import { ProofBlock } from "../components/workspace/ProofBlock.js";
 import AppShell from "../components/shell/AppShell.js";
+import GateGuide from "../components/workspace/GateGuide.js";
 import "../styles/workspace.css";
 import "../styles/screens.css";
 
@@ -36,10 +37,20 @@ export default function S4Outcome(): JSX.Element {
 
   const findings = useMemo(() => Object.values(store.findingsById), [store.findingsById]);
   const before = store.audit?.before.total ?? 0;
-  const after = store.audit?.after?.total ?? 0;
+  const after = store.audit?.after?.total ?? findings.filter(f => !["verified", "static_verified", "ignored"].includes(f.status)).length;
+  const checkedFixes = findings.filter(f => store.verifyByFinding[f.findingId]?.verdict === "VERIFIED").length;
+  const proposalStops = findings.filter(f => !!store.proposalsByFinding[f.findingId]?.length && !store.events.some(e => e.type === "patch.applied" && e.payload.findingId === f.findingId && (e.payload.result as { applied?: boolean })?.applied)).length;
+  const reviewOnly = findings.filter(f => f.status === "failed" && !store.proposalsByFinding[f.findingId]?.length).length;
 
-  const lastEvent = store.events.length > 0 ? store.events[store.events.length - 1] : undefined;
-  const traceHead = lastEvent?.hash ?? "";
+  const [traceHead, setTraceHead] = useState("");
+  useEffect(() => {
+    let active = true;
+    setTraceHead("");
+    if (id && store.audit?.evidenceHash) {
+      void getEvidencePack(id).then(pack => { if (active) setTraceHead(pack.traceHead); }).catch(() => {});
+    }
+    return () => { active = false; };
+  }, [id, store.audit?.evidenceHash]);
 
   const [applyBusy, setApplyBusy] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
@@ -74,13 +85,17 @@ export default function S4Outcome(): JSX.Element {
 
   const changedFiles = useMemo(() => {
     const files = new Set<string>();
-    for (const list of Object.values(store.proposalsByFinding)) {
-      for (const p of list) {
-        for (const op of p.ops) files.add(op.file);
+    for (const event of store.events) {
+      const result = event.payload.result as { applied?: boolean; filesChanged?: string[] } | undefined;
+      if (event.type === "patch.applied" && result?.applied) {
+        for (const file of result.filesChanged ?? []) files.add(file);
       }
     }
     return Array.from(files);
-  }, [store.proposalsByFinding]);
+  }, [store.events]);
+  const uncheckedPatch = store.events.some(event => event.type === "patch.applied" &&
+    (event.payload.result as { applied?: boolean } | undefined)?.applied &&
+    !findings.some(finding => finding.findingId === event.payload.findingId && ["verified", "static_verified"].includes(finding.status)));
 
   const onApply = async (): Promise<void> => {
     if (!id) return;
@@ -121,6 +136,10 @@ export default function S4Outcome(): JSX.Element {
 
       <OutcomeHero before={before} after={after} reduceMotion={reduceMotion} />
 
+      <section className="judge-summary" aria-label="Audit result summary"><h2>{checkedFixes ? "A checked fix. An honest stopping point." : "What the engine established."}</h2><div className="judge-summary__counts"><span><b>{before}</b>findings detected</span><span><b>{checkedFixes}</b>verified fixes</span><span><b>{proposalStops}</b>proposals not applied</span><span><b>{reviewOnly}</b>review stops without proposals</span></div><p>The engine’s verification applies to the individual fix. {after ? `${after} findings remain unresolved; the project has not been declared clear.` : "No unresolved findings remain within the supported detector rules."} Download the evidence to inspect the actual proposals, results and checks.</p></section>
+
+      <GateGuide />
+
       <GateMatrix findings={findings} verifyByFinding={store.verifyByFinding} />
 
       {id ? (
@@ -145,7 +164,7 @@ export default function S4Outcome(): JSX.Element {
             type="button"
             className="scr-primary-btn"
             data-testid="apply-btn"
-            disabled={applyBusy || changedFiles.length === 0}
+            disabled={applyBusy || changedFiles.length === 0 || uncheckedPatch}
             onClick={() => void onApply()}
           >
             {applyBusy ? "Applying…" : "Apply changes to project"}

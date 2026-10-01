@@ -54,6 +54,7 @@ export interface AgentToolContext {
 
   emit: (type: TraceType, actor: TraceEvent["actor"], payload: Record<string, unknown>) => TraceEvent;
   getTraceHead: () => string;
+  getTraceEvents?: () => TraceEvent[];
   requestApproval: (request: ApprovalRequest) => Promise<void>;
   onApprovalResolved: (approvalId: string) => Promise<ApprovalRequest>;
 

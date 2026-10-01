@@ -3,7 +3,7 @@
   "project": "Mitti Mart",
   "fixture": "f06-mitti-mart",
   "description": "Recorded deterministic scan and one engine-generated fix. No live agent session is represented.",
-  "recordedAt": "2026-10-01T12:58:12.332Z",
+  "recordedAt": "2026-10-01T14:40:07.439Z",
   "findings": [
     {
       "findingId": "F-PRM-002-1",
@@ -55,9 +55,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: False urgency",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: False urgency",
           "patternName": "False urgency",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Creating a sense of urgency or scarcity that is not genuine, such as fake countdown timers, is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -121,9 +121,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Basket sneaking",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Basket sneaking",
           "patternName": "Basket sneaking",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Adding paid items, add-ons, or subscriptions to a cart or order by default, without the consumer's affirmative action, is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -355,9 +355,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Interface interference",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Interface interference",
           "patternName": "Interface interference",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Visually obscuring, de-emphasising, or otherwise making it harder for a consumer to find or exercise a choice they are entitled to make is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -408,9 +408,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Drip pricing",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Drip pricing",
           "patternName": "Drip pricing",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Not disclosing mandatory, non-optional charges to the consumer in advance, and revealing them only at a later stage of the checkout flow, is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -469,9 +469,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: False urgency",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: False urgency",
           "patternName": "False urgency",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Creating a sense of urgency or scarcity that is not genuine, such as fake countdown timers, is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -703,9 +703,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Interface interference",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Interface interference",
           "patternName": "Interface interference",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Visually obscuring, de-emphasising, or otherwise making it harder for a consumer to find or exercise a choice they are entitled to make is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -756,9 +756,9 @@
       "regulation": [
         {
           "jurisdiction": "IN",
-          "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Drip pricing",
+          "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Drip pricing",
           "patternName": "Drip pricing",
-          "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+          "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
           "plainBasis": "Not disclosing mandatory, non-optional charges to the consumer in advance, and revealing them only at a later stage of the checkout flow, is listed as a prohibited dark pattern.",
           "verifiedAgainstGazette": false
         }
@@ -774,13 +774,13 @@
     "afterSha256": "bf6321bcbf74cc6e07e3d00de21b796a4e8534427d98912de71d7b20357479b2"
   },
   "proposal": {
-    "proposalId": "pp-70fd430d-7f7e-4ad1-8a58-b00bb154a6a3",
+    "proposalId": "pp-609c5c2b-1129-45d2-937e-201249a1c2e5",
     "findingId": "F-PRM-001-1",
     "strategy": "checkbox.default_off",
     "rationale": "Engine-generated proposal for strategy \"checkbox.default_off\" against finding F-PRM-001-1 (1 op).",
     "ops": [
       {
-        "opId": "op-set_initial_state_literal-a3b7745a",
+        "opId": "op-set_initial_state_literal-e3a6126f",
         "kind": "SET_INITIAL_STATE_LITERAL",
         "file": "src/pages/Cart.tsx",
         "target": {
@@ -798,7 +798,7 @@
     "requiresApproval": false
   },
   "patch": {
-    "proposalId": "pp-70fd430d-7f7e-4ad1-8a58-b00bb154a6a3",
+    "proposalId": "pp-609c5c2b-1129-45d2-937e-201249a1c2e5",
     "applied": true,
     "filesChanged": [
       "src/pages/Cart.tsx"
@@ -844,6 +844,6 @@
     ],
     "failureReasons": [],
     "engineVersion": "0.1.0",
-    "verifiedAt": "2026-10-01T12:58:12.332Z"
+    "verifiedAt": "2026-10-01T14:40:07.439Z"
   }
 }

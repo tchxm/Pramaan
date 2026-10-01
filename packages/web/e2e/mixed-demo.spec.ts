@@ -9,6 +9,16 @@ test("Run demo reaches one verified outcome, one proposal stop and two review-on
   await expect(page.getByText("Scripted demo · actual engine execution.")).toBeVisible();
   await page.keyboard.press("Escape"); // Guided pane tour can be dismissed without stopping the run.
   await expect(page.getByRole("link", { name: "Open outcome & evidence →" })).toBeVisible({ timeout: 45000 });
+  await page.getByRole("tab", { name: "Checkout preview", exact: true }).click();
+  await expect(page.getByTestId("checkout-original").getByRole("checkbox")).toBeChecked();
+  await expect(page.getByTestId("original-total")).toHaveText("₹887");
+  await page.getByRole("button", { name: "Patched", exact: true }).click();
+  await expect(page.getByTestId("checkout-patched").getByRole("checkbox")).not.toBeChecked();
+  await expect(page.getByTestId("patched-total")).toHaveText("₹838");
+  await page.getByTestId("checkout-patched").getByRole("checkbox").check();
+  await expect(page.getByTestId("patched-total")).toHaveText("₹887");
+  await page.getByRole("button", { name: "Reset shopper choices" }).click();
+  await expect(page.getByTestId("patched-total")).toHaveText("₹838");
   const complete = page.getByTestId("finding-row-F-PRM-001-1");
   const midpoint = page.getByTestId("finding-row-F-PRM-002-1");
   await expect(complete).toContainText("Verified · evidence recorded");
@@ -32,6 +42,7 @@ test("Run demo reaches one verified outcome, one proposal stop and two review-on
   await expect(page.getByRole("button", { name: "Download evidence pack" })).toBeVisible();
   await expect(page.getByTestId("outcome-before")).toHaveText("4");
   await expect(page.getByTestId("outcome-after")).toHaveText("3");
+  await expect(page.getByRole("region", { name: "Audit result summary" })).toContainText("proposals not applied");
   const waiting = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download evidence pack" }).click();
   const download = await waiting;

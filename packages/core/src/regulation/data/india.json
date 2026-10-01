@@ -1,34 +1,34 @@
 {
-  "regulationDataVersion": "2026.1",
-  "auditDuty": "Rule 4(15), Consumer Protection (E-Commerce) Rules, 2020 (as amended): every e-commerce entity shall undertake a self-audit to identify and remove dark patterns from its platform.",
+  "regulationDataVersion": "2026.2",
+  "auditDuty": "CCPA self-audit advisory issued 5 June 2025, reported by PIB on 7 June 2025: e-commerce platforms were advised to identify and resolve dark patterns within three months. This is advisory context, not a legal certification by PRAMAAN.",
   "patterns": {
     "BASKET_SNEAKING": {
       "patternName": "Basket sneaking",
-      "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Basket sneaking",
+      "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Basket sneaking",
       "plainBasis": "Adding paid items, add-ons, or subscriptions to a cart or order by default, without the consumer's affirmative action, is listed as a prohibited dark pattern.",
       "verifiedAgainstGazette": false
     },
     "FALSE_URGENCY": {
       "patternName": "False urgency",
-      "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: False urgency",
+      "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: False urgency",
       "plainBasis": "Creating a sense of urgency or scarcity that is not genuine, such as fake countdown timers, is listed as a prohibited dark pattern.",
       "verifiedAgainstGazette": false
     },
     "INTERFACE_INTERFERENCE": {
       "patternName": "Interface interference",
-      "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Interface interference",
+      "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Interface interference",
       "plainBasis": "Visually obscuring, de-emphasising, or otherwise making it harder for a consumer to find or exercise a choice they are entitled to make is listed as a prohibited dark pattern.",
       "verifiedAgainstGazette": false
     },
     "DRIP_PRICING": {
       "patternName": "Drip pricing",
-      "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Drip pricing",
+      "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Drip pricing",
       "plainBasis": "Not disclosing mandatory, non-optional charges to the consumer in advance, and revealing them only at a later stage of the checkout flow, is listed as a prohibited dark pattern.",
       "verifiedAgainstGazette": false
     },
     "CONFIRM_SHAMING": {
       "patternName": "Confirm shaming",
-      "framework": "Consumer Protection (E-Commerce) Rules, 2020 — Annex on dark patterns, Schedule item: Confirm shaming",
+      "framework": "CCPA Guidelines for Prevention and Regulation of Dark Patterns, 2023 — Annexure I: Confirm shaming",
       "plainBasis": "Using language and design choices to shame a consumer into opting into something, or making decline options read as an admission of a negative trait, is listed as a prohibited dark pattern.",
       "verifiedAgainstGazette": false
     }

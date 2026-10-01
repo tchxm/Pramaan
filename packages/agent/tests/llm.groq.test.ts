@@ -136,4 +136,28 @@ describe("GroqLLMClient", () => {
     ]);
     expect(JSON.parse(raw)).toEqual({ likely: false, rationale: "r", suggestedText: "s" });
   });
+
+  it("honors a bounded Retry-After delay for 429 without leaking the API key", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = globalThis.fetch as unknown as ReturnType<typeof vi.fn>;
+      fetchMock.mockResolvedValueOnce(new Response("rate limited", { status: 429, headers: { "retry-after": "9" } }));
+      fetchMock.mockResolvedValueOnce(jsonResponse({ choices: [{ finish_reason: "stop", message: { content: "ready" } }] }));
+      const result = new GroqLLMClient({ apiKey: "gsk_test_key" }).complete([{ role: "user", content: "hi" }], []);
+      await vi.advanceTimersByTimeAsync(9249);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      expect((await result).text).toBe("ready");
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    } finally { vi.useRealTimers(); }
+  });
+
+  it("rejects malformed completion shapes and classifies a missing model as unavailable", async () => {
+    const fetchMock = globalThis.fetch as unknown as ReturnType<typeof vi.fn>;
+    fetchMock.mockResolvedValueOnce(jsonResponse({ choices: [] }));
+    const client = new GroqLLMClient({ apiKey: "gsk_test_key" });
+    await expect(client.complete([{ role: "user", content: "hi" }], [])).rejects.toThrow("malformed completion");
+    fetchMock.mockResolvedValueOnce(new Response("model not found", { status: 404 }));
+    await expect(client.complete([{ role: "user", content: "hi" }], [])).rejects.toThrow(LLMUnavailableError);
+  });
 });

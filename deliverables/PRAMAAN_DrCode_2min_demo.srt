@@ -1,0 +1,159 @@
+1
+00:00:00,390 --> 00:00:03,990
+Coffee: seven ninety-nine. At payment: eight
+
+2
+00:00:04,010 --> 00:00:07,010
+eighty-seven. Who chose the extras?
+
+3
+00:00:08,370 --> 00:00:10,790
+Preselected extras, false countdowns, hidden
+
+4
+00:00:10,810 --> 00:00:13,670
+fees. PRAMAAN finds deceptive checkout patterns
+
+5
+00:00:13,690 --> 00:00:16,140
+in React source, proposes bounded fixes, and
+
+6
+00:00:16,160 --> 00:00:19,190
+checks the result. India's CCPA has advised
+
+7
+00:00:19,210 --> 00:00:21,510
+e-commerce platforms to self-audit for dark
+
+8
+00:00:21,530 --> 00:00:22,200
+patterns.
+
+9
+00:00:23,390 --> 00:00:25,500
+Here's a recorded live-agent run on a
+
+10
+00:00:25,520 --> 00:00:29,030
+single-finding test project. The detector identifies
+
+11
+00:00:29,050 --> 00:00:31,370
+a paid extra selected before the shopper
+
+12
+00:00:31,390 --> 00:00:33,260
+chooses it, and links the finding to
+
+13
+00:00:33,280 --> 00:00:34,070
+its source.
+
+14
+00:00:35,400 --> 00:00:38,400
+The agent reads that source and chooses
+
+15
+00:00:38,420 --> 00:00:42,000
+a whitelisted repair strategy. It proposes the
+
+16
+00:00:42,020 --> 00:00:46,050
+change; it cannot declare success. Typed tools
+
+17
+00:00:46,080 --> 00:00:48,500
+pass the proposal to the engine, which
+
+18
+00:00:48,520 --> 00:00:51,190
+constructs the exact edit and checks its
+
+19
+00:00:51,210 --> 00:00:51,890
+policy.
+
+20
+00:00:55,400 --> 00:00:58,120
+The patch changes one initial value from
+
+21
+00:00:58,140 --> 00:01:01,670
+true to false, inside an isolated workspace.
+
+22
+00:01:02,350 --> 00:01:05,980
+Delivery protection stays available. The shopper
+
+23
+00:01:06,000 --> 00:01:09,620
+opts in. The forty-nine-rupee add-on is no
+
+24
+00:01:09,640 --> 00:01:13,160
+longer automatic, and the original project remains
+
+25
+00:01:13,180 --> 00:01:13,890
+untouched.
+
+26
+00:01:15,400 --> 00:01:17,780
+Now the engine checks five things: the
+
+27
+00:01:17,800 --> 00:01:20,980
+target pattern is cleared, protected values
+
+28
+00:01:21,000 --> 00:01:24,200
+are preserved, the project builds, browser behavior
+
+29
+00:01:24,220 --> 00:01:27,750
+passes, and no new findings appear. All
+
+30
+00:01:27,770 --> 00:01:31,880
+five pass. The engine returns VERIFIED: one
+
+31
+00:01:31,900 --> 00:01:33,970
+finding, zero unresolved.
+
+32
+00:01:35,370 --> 00:01:37,690
+The evidence pack records the proposal, results
+
+33
+00:01:37,710 --> 00:01:40,390
+and source hashes. Its matching trace verifies
+
+34
+00:01:40,410 --> 00:01:42,990
+the chain and its committed head. Unresolved
+
+35
+00:01:43,010 --> 00:01:45,630
+work stays visible in other audits. This
+
+36
+00:01:45,650 --> 00:01:47,770
+supports technical self-auditing; it does not
+
+37
+00:01:47,790 --> 00:01:49,220
+certify legal compliance.
+
+38
+00:01:50,380 --> 00:01:54,600
+Pramaan. The agent proposes. The engine decides.
+
+39
+00:01:55,140 --> 00:01:58,460
+Find the deception. Check the fix. Show
+
+40
+00:01:58,480 --> 00:01:59,140
+the proof.

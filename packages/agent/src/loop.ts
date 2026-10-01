@@ -64,7 +64,12 @@ export async function runAgentLoop(
       break;
     }
 
-    trace.emit({ type: "agent.reason", actor: "agent", payload: { text: reply.text, stopReason: reply.stopReason } });
+    const provenance = reply.raw as { pramaanProvider?: string; model?: string } | undefined;
+    if (ctx.llmInfo.mode === "live" && provenance?.pramaanProvider) {
+      ctx.llmInfo.provider = provenance.pramaanProvider;
+      ctx.llmInfo.model = provenance.model ?? "unknown";
+    }
+    trace.emit({ type: "agent.reason", actor: "agent", payload: { text: reply.text, stopReason: reply.stopReason, provider: ctx.llmInfo.provider, model: ctx.llmInfo.model } });
     messages.push({ role: "assistant", content: reply.text, toolCalls: reply.toolCalls });
 
     if (reply.toolCalls.length === 0) {
@@ -94,8 +99,10 @@ export async function runAgentLoop(
     }
   }
 
-  if (isWallClockExhausted(budget)) stoppedReason = "wall_clock_exhausted";
-  else if (isToolBudgetExhausted(budget) && !allFindingsTerminal(ctx)) stoppedReason = "tool_budget_exhausted";
+  if (stoppedReason !== "llm_unavailable") {
+    if (isWallClockExhausted(budget)) stoppedReason = "wall_clock_exhausted";
+    else if (isToolBudgetExhausted(budget) && !allFindingsTerminal(ctx)) stoppedReason = "tool_budget_exhausted";
+  }
 
   // Budget enforcement is a deterministic ENGINE decision, never the LLM's
   // (I-11, Spec 14.4 "if budget exhausted: every non-terminal finding ->
@@ -108,8 +115,8 @@ export async function runAgentLoop(
         code: "BUDGET_EXHAUSTED",
         message:
           stoppedReason === "wall_clock_exhausted"
-            ? "15-minute wall-clock audit budget exhausted before this finding reached a terminal state"
-            : "60-tool-call audit budget exhausted before this finding reached a terminal state",
+            ? `${budget.maxWallClockMs / 1000}-second wall-clock audit budget exhausted before this finding reached a terminal state`
+            : `${budget.maxToolCalls}-tool-call audit budget exhausted before this finding reached a terminal state`,
         data: { toolCalls: budget.toolCalls, maxToolCalls: budget.maxToolCalls },
       };
     }

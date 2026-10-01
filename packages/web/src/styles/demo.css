@@ -10,6 +10,7 @@
 .demo-steps button[aria-current]{border-color:#8ce8da;background:#16342c}
 .demo-stage{display:grid;grid-template-columns:.9fr 1.1fr;gap:36px;border:1px solid #34443f;border-radius:8px;padding:32px;min-height:420px;background:#0e1512}
 .demo-narration h2,.demo-files h2{font:400 30px/1.2 var(--font-heading,serif)}
+.demo-stage--wide{grid-template-columns:1fr}.demo-stage--wide .demo-narration{max-width:760px}.demo-stage--wide .demo-output{padding:24px}.demo-gates li{gap:18px;line-height:1.6}.demo-gates b{flex:none}
 .demo-narration p,.demo-files p{color:#b6c2bd;line-height:1.7}
 .demo-output{min-width:0;background:#131f1a;border-radius:6px;padding:24px}
 .demo-cart h3{font-size:26px;margin:18px 0}.demo-price,.demo-extra{display:flex;justify-content:space-between;gap:12px}

@@ -25,13 +25,15 @@ import { TraceStrip } from "../components/workspace/TraceStrip.js";
 import { TraceDetail } from "../components/workspace/TraceDetail.js";
 import { ApprovalDrawer } from "../components/workspace/ApprovalDrawer.js";
 import DemoTour from "../components/workspace/DemoTour.js";
-import FindingJourney, { findingProgressLabel } from "../components/workspace/FindingJourney.js";
+import FindingJourney, { findingProgressLabel, reviewLabel } from "../components/workspace/FindingJourney.js";
+import CheckoutPreview, { protectionDefault } from "../components/workspace/CheckoutPreview.js";
+import GateGuide from "../components/workspace/GateGuide.js";
 import { useBreakpoint } from "./useMediaQuery.js";
 
 import "../styles/workspace.css";
 import "../styles/screens.css";
 
-type CenterView = "code" | "diff" | "compare";
+type CenterView = "code" | "diff" | "compare" | "preview";
 type NarrowTab = "files" | "finding" | "evidence" | "trace";
 
 export default function S2Workspace(): JSX.Element {
@@ -87,6 +89,21 @@ export default function S2Workspace(): JSX.Element {
 
   const [leftTab, setLeftTab] = useState<"files" | "findings">("findings");
   const [centerView, setCenterView] = useState<CenterView>("code");
+  const [checkoutSource, setCheckoutSource] = useState<{ before?: boolean; after?: boolean }>({});
+  const protectionFinding = findings.find(f => f.ruleId === "PRM-001");
+  const protectionApplied = events.some(e => e.type === "patch.applied" && e.payload.findingId === protectionFinding?.findingId && (e.payload.result as { applied?: boolean })?.applied);
+  useEffect(() => {
+    if (scriptedDemo && protectionFinding) { setCenterView("preview"); selectFinding(protectionFinding.findingId); }
+  }, [scriptedDemo, protectionFinding?.findingId]);
+  useEffect(() => {
+    setCheckoutSource({});
+    if (!auditId || !scriptedDemo) return;
+    let cancelled = false;
+    Promise.all([getAuditFile(auditId, "src/pages/Cart.tsx", "before"), protectionApplied ? getAuditFile(auditId, "src/pages/Cart.tsx", "after") : Promise.resolve(null)])
+      .then(([before, after]) => { if (!cancelled) setCheckoutSource({ before: protectionDefault(before.text), after: after ? protectionDefault(after.text) : undefined }); })
+      .catch(() => { if (!cancelled) setCheckoutSource({}); });
+    return () => { cancelled = true; };
+  }, [auditId, scriptedDemo, protectionApplied, diffRevision]);
   const [narrowTab, setNarrowTab] = useState<NarrowTab>("finding");
   const [mediumShowRight, setMediumShowRight] = useState(false);
   const [selectedTraceSeq, setSelectedTraceSeq] = useState<number | null>(null);
@@ -225,7 +242,7 @@ export default function S2Workspace(): JSX.Element {
   const centerPane = (
     <div className="scr-center-pane">
       <div className="scr-tabbar" role="tablist" aria-label="Code views">
-        {(["code", "diff", "compare"] as CenterView[]).map((v) => (
+        {((scriptedDemo ? ["preview", "code", "diff", "compare"] : ["code", "diff", "compare"]) as CenterView[]).map((v) => (
           <button
             key={v}
             type="button"
@@ -234,7 +251,7 @@ export default function S2Workspace(): JSX.Element {
             className={centerView === v ? "scr-tab scr-tab--active" : "scr-tab"}
             onClick={() => setCenterView(v)}
           >
-            {v === "code" ? "Code" : v === "diff" ? "Diff" : "Before/after"}
+            {v === "preview" ? "Checkout preview" : v === "code" ? "Code" : v === "diff" ? "Diff" : "Browser evidence"}
           </button>
         ))}
       </div>
@@ -243,7 +260,8 @@ export default function S2Workspace(): JSX.Element {
         <p className="scr-empty-hint">Select a finding to inspect it.</p>
       ) : (
         <>
-          <FindingJourney finding={selectedFinding} hasProposal={!!latestProposal} verify={selectedVerify} events={events} />
+          {centerView === "preview" ? <details className="checkout-progress"><summary>{progressLabels[selectedFinding.findingId]} · show engine progress</summary><FindingJourney finding={selectedFinding} hasProposal={!!latestProposal} verify={selectedVerify} events={events} /></details> : <FindingJourney finding={selectedFinding} hasProposal={!!latestProposal} verify={selectedVerify} events={events} />}
+          {centerView === "preview" && <>{checkoutSource.before !== undefined ? <CheckoutPreview original={checkoutSource.before} patched={checkoutSource.after} verified={!!protectionFinding && verifyByFinding[protectionFinding.findingId]?.verdict === "VERIFIED"} /> : <p className="scr-empty-hint">Loading the original checkout source…</p>}<p className="scr-empty-hint">Preview illustrates the protection checkbox only. Select a finding’s Code or Diff to inspect its own evidence.</p></>}
           {centerView === "code" &&
             (codeLoading ? (
               <div className="scr-skeleton-row" />
@@ -296,6 +314,7 @@ export default function S2Workspace(): JSX.Element {
       {selectedFinding.evidence.cascade ? <CascadeTable entries={selectedFinding.evidence.cascade} /> : null}
       <RegulationBasis refs={selectedFinding.regulation} />
       <GatesPanel verify={selectedVerify} pending={selectedFinding.status === "remediating"} />
+      <GateGuide />
     </div>
   ) : (
     <div className="scr-right-pane">
@@ -356,7 +375,7 @@ export default function S2Workspace(): JSX.Element {
         <PhaseBar phase={store.phase} failed={phaseFailed} />
         {selectedFinding ? (
           <div data-testid="verdict-chip" aria-live="polite">
-            <StatusPill status={selectedFinding.status} />
+            <StatusPill status={selectedFinding.status} label={reviewLabel(selectedFinding, !!latestProposal)} />
           </div>
         ) : null}
         {evidenceReady && id && <Link className="scr-secondary-btn" to={`/audit/${id}/outcome`}>Open outcome &amp; evidence →</Link>}

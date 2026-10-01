@@ -66,7 +66,7 @@ export interface RegulationRef {
   jurisdiction: "IN";
   framework: string;
   patternName: string;
-  auditDuty: string; // Rule 4(15) reference text
+  auditDuty: string; // source-attributed self-audit advisory context
   plainBasis: string; // paraphrase from india.json
   verifiedAgainstGazette: boolean;
 }

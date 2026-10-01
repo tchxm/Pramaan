@@ -9,7 +9,7 @@ import BootRobot from "./BootRobot.js";
  */
 const BOOT_LINES = [
   "detector engine — 5 pattern types armed",
-  "regulation reference — Consumer Protection (E-Commerce) Rules, 2020",
+  "regulation reference — CCPA Dark Patterns Guidelines, 2023",
   "patch engine — 7 whitelisted operation kinds",
   "verification gates — G1–G5 armed",
   "evidence engine — SHA-256 hash chain",

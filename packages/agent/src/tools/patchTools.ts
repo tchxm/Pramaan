@@ -133,6 +133,7 @@ export async function patchApplyHandler(input: unknown, ctx: AgentToolContext): 
   finding.status = "remediating";
   const policyCtx = { ...ctx.policyCtx, finding };
   const result = await applyPatch(ctx.workspace, effectiveProposal, ctx.config, policyCtx);
+  finding.attempts = ctx.policyCtx.attemptsByFinding.get(finding.findingId) ?? 0;
   ctx.results.set(proposal.proposalId, result);
 
   ctx.emit("patch.applied", "engine", { proposalId: proposal.proposalId, findingId: proposal.findingId, result });

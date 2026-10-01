@@ -232,6 +232,13 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
       sendError(reply, "E_STATE_CONFLICT", `Audit ${id} has already been applied`);
       return;
     }
+    const unchecked = record.proposals.some(proposal =>
+      record.results.some(result => result.proposalId === proposal.proposalId && result.applied) &&
+      !record.audit.findings.some(finding => finding.findingId === proposal.findingId && ["verified", "static_verified"].includes(finding.status)));
+    if (!["completed", "completed_with_failures"].includes(record.audit.status) || unchecked) {
+      sendError(reply, "E_STATE_CONFLICT", "Complete verification for every applied patch before writing changes to the project.");
+      return;
+    }
     if (!(await pathExists(record.workspaceRoot))) {
       sendError(reply, "E_STATE_CONFLICT", "Audit has no workspace to apply yet");
       return;

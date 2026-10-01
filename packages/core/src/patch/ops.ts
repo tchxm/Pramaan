@@ -556,8 +556,47 @@ function applyRemoveJsxElement(op: PatchOp, ctx: ApplyOpContext): ApplyOpResult 
   if (!located) {
     throw err("E_TARGET_NOT_FOUND", "element to remove not found", { file: op.file });
   }
-  const { element } = located;
-  const newSource = source.slice(0, element.range.startOffset) + source.slice(element.range.endOffset);
+  let { element } = located;
+  // False-urgency findings describe the component's JSX root. Remove only
+  // the smallest display containing both the urgency text and timer value.
+  if (ctx.finding.pattern === "FALSE_URGENCY") {
+    const getter = ctx.finding.evidence.observed.seedGetter;
+    const urgency = ctx.finding.evidence.observed.urgencyText;
+    if (typeof getter !== "string" || typeof urgency !== "string") {
+      throw err("E_TARGET_NOT_FOUND", "timer display evidence is missing", { file: op.file });
+    }
+    const derived = [getter];
+    const componentSource = source.slice(located.component.range.startOffset, located.component.range.endOffset);
+    for (const match of componentSource.matchAll(/\b(?:const|let)\s+(\w+)\s*=\s*([^;]+);/g)) {
+      if (new RegExp(`\\b${getter}\\b`).test(match[2]!)) derived.push(match[1]!);
+    }
+    const value = new RegExp(`\\b(?:${derived.join("|")})\\b`);
+    const display = (node: JsxElementNode): JsxElementNode | undefined => {
+      const text = source.slice(node.range.startOffset, node.range.endOffset);
+      if (!text.toLowerCase().includes(urgency.toLowerCase()) || !value.test(text)) return undefined;
+      for (const child of node.children) {
+        const found = display(child);
+        if (found) return found;
+      }
+      return node;
+    };
+    const target = display(element);
+    if (!target || target === located.component.jsxRoot) {
+      throw err("E_TARGET_NOT_FOUND", "no isolated timer display can be removed safely", { file: op.file });
+    }
+    const containsProtected = (node: JsxElementNode): boolean =>
+      ["button", "a", "input", "select", "textarea", "form", ...ctx.config.buttonComponents, ...ctx.config.checkboxComponents].includes(node.tag) ||
+      ctx.config.currency.some(symbol => node.textChildren.join(" ").includes(symbol)) ||
+      node.children.some(containsProtected);
+    if (containsProtected(target)) {
+      throw err("E_PROTECTED_ELEMENT", "timer display contains protected prices or shopper controls", { file: op.file });
+    }
+    element = target;
+  }
+  // An empty fragment renders nothing but preserves sibling JSX paths used
+  // by the detector and protected-element identities.
+  const replacement = ctx.finding.pattern === "FALSE_URGENCY" ? "<></>" : "";
+  const newSource = source.slice(0, element.range.startOffset) + replacement + source.slice(element.range.endOffset);
   setFile(ctx, op.file, newSource);
 
   const reparsed = parseJsxFile(op.file, newSource);

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, mkdir } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, writeFile, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { appendEvent, buildEvidencePack, GENESIS_HASH, type Audit } from "@pramaan/core";
@@ -7,6 +7,27 @@ import { buildApp } from "./app.js";
 import { AuditStore } from "./store.js";
 
 let tmpRoot: string;
+
+it("refuses to copy a failed applied patch into the original project", async () => {
+  const store = new AuditStore(tmpRoot);
+  const app = await buildApp({store});
+  const project = path.join(tmpRoot, "apply-original");
+  const workspace = path.join(tmpRoot, "apply-workspace");
+  await mkdir(project); await mkdir(workspace);
+  await writeFile(path.join(project, "Cart.tsx"), "original");
+  await writeFile(path.join(workspace, "Cart.tsx"), "unchecked patch");
+  const id = await store.createAudit({type: "path", path: project}, {}, project);
+  await new Promise(resolve => setTimeout(resolve, 50));
+  const record = store.get(id)!;
+  record.workspaceRoot = workspace;
+  record.audit.status = "completed_with_failures";
+  record.proposals.push({proposalId:"P-unsafe",findingId:"F-unsafe",strategy:"timer.remove_display",rationale:"test",ops:[],risk:"deterministic",requiresApproval:false});
+  record.results.push({proposalId:"P-unsafe",applied:true,filesChanged:["Cart.tsx"],diff:"",policyViolations:[]});
+  const response = await app.inject({method:"POST",url:`/api/audits/${id}/apply`,payload:{confirm:true}});
+  expect(response.statusCode).toBe(409);
+  expect(await readFile(path.join(project,"Cart.tsx"),"utf8")).toBe("original");
+  await app.close();
+});
 
 beforeEach(async () => {
   tmpRoot = await mkdtemp(path.join(os.tmpdir(), "pramaan-server-test-"));

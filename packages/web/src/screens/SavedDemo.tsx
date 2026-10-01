@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppShell from "../components/shell/AppShell.js";
+import CheckoutPreview, { protectionDefault } from "../components/workspace/CheckoutPreview.js";
+import GateGuide, { gateDescriptions } from "../components/workspace/GateGuide.js";
 import "../styles/demo.css";
 
 type RecordData = {
@@ -41,10 +43,11 @@ export default function SavedDemo() {
       <p className="demo-kicker">Saved demo · actual engine output · no API key needed</p>
       <h1>From a deceptive checkout<br />to a checked fix.</h1>
       <p className="demo-lede">PRAMAAN audits React source for dark patterns, lets an agent propose a limited change, and uses independent engine checks to decide whether the fix works. This saved example shows those checks on Mitti Mart, a sample coffee shop.</p>
+      <section className="judge-principle" aria-label="How PRAMAAN earns trust"><div><span>01 / FIND & PROPOSE</span><h2>The agent proposes the change.</h2><p>Source-linked findings and a bounded patch, rather than a vague recommendation to redesign the page.</p></div><div><span>02 / CHECK & RECORD</span><h2>The engine decides if it passes.</h2><p>Independent checks of the source, protected values, build, browser behavior and new findings. Download the result and inspect the patch.</p></div></section>
       <nav className="demo-steps" aria-label="Demo steps">
         {steps.map((label, i) => <button key={label} aria-current={step === i ? "step" : undefined} onClick={() => setStep(i)}><span>0{i + 1}</span>{label}</button>)}
       </nav>
-      <section className="demo-stage" aria-live="polite">
+      <section className={`demo-stage${step === 2 ? " demo-stage--wide" : ""}`} aria-live="polite">
         <div className="demo-narration">
           <p className="demo-kicker">0{step + 1} / 04</p>
           <h2>{steps[step]}</h2>
@@ -55,10 +58,10 @@ export default function SavedDemo() {
         </div>
         <div className="demo-output">
           {error ? <p role="alert">The saved example could not load. Reload this page to retry.</p> : !record ? <p role="status">Loading saved engine output…</p> : <>
-            {step === 0 && <div className="demo-cart"><p className="demo-kicker">Mitti Mart · simplified checkout illustration</p><h3>Your basket</h3><div className="demo-price">Organic Coffee <b>₹799</b></div><p className="demo-countdown">Offer expires in 02:00</p><p className="demo-extra">☑ Delivery Protection <b>₹49</b></p><div className="demo-choice"><span>Yes, protect my order</span><small>No thanks</small></div><p className="demo-note">Recorded source: src/pages/Cart.tsx</p></div>}
+            {step === 0 && <div className="demo-cart"><p className="demo-kicker">Mitti Mart · simplified checkout illustration</p><h3>Your basket</h3><p className="demo-verdict">₹799 advertised.<br />₹887 at payment.</p><div className="demo-price">Organic Coffee <b>₹799</b></div><p className="demo-countdown">Offer expires in 02:00</p><p className="demo-extra">☑ Preselected protection <b>+ ₹49</b></p><div className="demo-choice"><span>Yes, protect my order</span><small>No thanks</small></div><p className="demo-extra">Fee disclosed at payment <b>+ ₹39</b></p><div className="demo-price"><strong>What the shopper pays</strong><b>₹887</b></div><p className="demo-note">₹88 beyond the advertised product price. PRAMAAN identifies the source of the preselection, pressure and late disclosure.</p></div>}
             {step === 1 && <ol className="demo-findings">{record.findings.map(f => <li key={f.ruleId}><span className="demo-kicker">{f.ruleId} · {f.location.file}:{f.location.startLine}</span><h3>{explanations[f.ruleId]?.[0] ?? f.pattern}</h3><p>{explanations[f.ruleId]?.[1]}</p></li>)}</ol>}
-            {step === 2 && <><p className="demo-kicker">Actual engine patch · Cart.tsx</p><pre className="demo-diff">{record.patch.diff}</pre><div className="demo-comparison"><div><span>Before</span><p>☑ Protection selected</p><code>useState(true)</code></div><div><span>After</span><p>☐ Shopper chooses</p><code>useState(false)</code></div></div></>}
-            {step === 3 && <><p className="demo-verdict">{record.verification.verdict} <span>one finding</span></p><ul className="demo-gates">{record.verification.gates.map(g => <li key={g.gate}><span>{g.gate.replaceAll("_", " ")}</span><b>{g.status}</b></li>)}</ul><p className="demo-note">Recorded {new Date(record.recordedAt).toLocaleDateString()} · {record.remainingFindings.length} findings still open</p></>}
+            {step === 2 && <><CheckoutPreview original={protectionDefault(record.source.before) ?? true} patched={protectionDefault(record.source.after)} verified={record.verification.verdict === "VERIFIED"} paired /><p className="demo-kicker" style={{ marginTop: 24 }}>Actual engine patch · Cart.tsx</p><pre className="demo-diff">{record.patch.diff}</pre></>}
+            {step === 3 && <><p className="demo-verdict">{record.verification.verdict} <span>one finding</span></p><ul className="demo-gates">{record.verification.gates.map(g => <li key={g.gate}><span>{g.gate.split("_")[0]} · {gateDescriptions.find(d => d[0] === g.gate.split("_")[0])?.[1] ?? g.gate}</span><b>{g.status}</b></li>)}</ul><GateGuide /><p className="demo-note">Recorded {new Date(record.recordedAt).toLocaleDateString()} · {record.remainingFindings.length} findings still open</p></>}
           </>}
         </div>
       </section>

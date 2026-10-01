@@ -251,7 +251,9 @@ function classify(el: JsxElementNode, config: PramaanConfig): string | null {
   if (tag === "select" || tag === "textarea") return "form_field";
   if (config.checkboxComponents.includes(el.tag)) return "checkbox_control";
 
-  if (config.currency.some((sym) => text.includes(sym))) return "price";
+  // Protect the element displaying a price, rather than every ancestor
+  // whose aggregated text happens to include a descendant's currency.
+  if (config.currency.some((sym) => el.textChildren.join(" ").includes(sym))) return "price";
 
   if (tag === "button" || tag === "a" || config.buttonComponents.includes(el.tag)) {
     const haystack = `${className} ${text}`;

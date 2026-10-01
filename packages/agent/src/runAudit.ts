@@ -220,6 +220,7 @@ export async function runAudit(options: RunAuditOptions, io: RunAuditIO): Promis
     approvals,
     emit: (type, actor, payload) => trace.emit({ type, actor, payload }),
     getTraceHead: () => trace.traceHead,
+    getTraceEvents: () => [...trace.events],
     requestApproval: io.requestApproval,
     onApprovalResolved: io.onApprovalResolved,
     mintApprovalToken,
@@ -254,7 +255,9 @@ export async function runAudit(options: RunAuditOptions, io: RunAuditIO): Promis
 
   const anyFailed = [...findings.values()].some((f) => f.status === "failed");
   const status: Audit["status"] =
-    outcome.stoppedReason === "wall_clock_exhausted" && ![...findings.values()].every((f) => TERMINAL.has(f.status))
+    outcome.stoppedReason === "llm_unavailable"
+      ? "error"
+      : outcome.stoppedReason === "wall_clock_exhausted" && ![...findings.values()].every((f) => TERMINAL.has(f.status))
       ? "completed_with_failures"
       : anyFailed
         ? "completed_with_failures"

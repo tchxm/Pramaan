@@ -19,5 +19,6 @@
     "noEmit": false,
     "types": ["vite/client"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "src/**/__tests__/**"]
 }

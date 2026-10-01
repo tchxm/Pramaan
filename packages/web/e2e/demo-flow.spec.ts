@@ -1,5 +1,22 @@
 import { test, expect } from "@playwright/test";
 
+test("saved checkout comparison demonstrates optional protection without claiming other findings are fixed", async ({ page }) => {
+  await page.route("**/api/**", route => route.abort());
+  await page.goto("/demo?step=3");
+  const original = page.getByTestId("checkout-original");
+  const patched = page.getByTestId("checkout-patched");
+  await expect(original.getByRole("checkbox")).toBeChecked();
+  await expect(patched.getByRole("checkbox")).not.toBeChecked();
+  await expect(page.getByTestId("original-total")).toHaveText("₹887");
+  await expect(page.getByTestId("patched-total")).toHaveText("₹838");
+  await patched.getByRole("checkbox").check();
+  await expect(page.getByTestId("patched-total")).toHaveText("₹887");
+  await expect(patched).toContainText("still need review");
+  await page.reload();
+  await expect(page.getByTestId("checkout-patched").getByRole("checkbox")).not.toBeChecked();
+  await expect(page.locator(".demo-diff")).toContainText("useState(false)");
+});
+
 test("saved demo works without API and refresh retains the selected step", async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem("pramaan:boot-shown", "1"));
   await page.route("**/api/**", route => route.abort());

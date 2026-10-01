@@ -30,6 +30,10 @@ it("runs one complete fix, one proposal-only stop, and two stops without proposa
     const pack = JSON.parse(await readFile(report.payload.packPath as string, "utf8"));
     expect(pack.llm.mode).toBe("replay");
     expect((await verifyEvidencePack(pack)).valid).toBe(true);
+    const bundledTrace = (await readFile(path.join(path.dirname(report.payload.packPath as string), "trace.jsonl"), "utf8")).trim().split("\n").map(line => JSON.parse(line));
+    const proof = await verifyEvidencePack(pack, { traceEvents: bundledTrace });
+    expect(proof.valid).toBe(true);
+    expect(proof.checks.map(c => c.name)).toEqual(["evidence_hash", "trace_chain", "trace_head"]);
     const cartHash = pack.files.find((f: any) => f.path === "src/pages/Cart.tsx");
     expect(cartHash.sha256Before).not.toBe(cartHash.sha256After);
     expect(cartHash.sha256After).toBe(await hashFile(path.join(root, ".pramaan/workspaces", auditId, "src/pages/Cart.tsx")));

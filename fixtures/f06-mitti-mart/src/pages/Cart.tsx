@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FEES } from "../constants/fees";
 
 export default function Cart() {
-  const [protection, setProtection] = useState(false);
+  const [protection, setProtection] = useState(true);
   const [secondsLeft, setSecondsLeft] = useState(120);
   const navigate = useNavigate();
 

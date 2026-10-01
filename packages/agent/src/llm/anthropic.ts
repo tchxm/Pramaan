@@ -30,8 +30,7 @@ export const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929";
 
 function redactKey(key: string | undefined): string {
   if (!key) return "(missing)";
-  if (key.length <= 8) return "***";
-  return `${key.slice(0, 4)}...${key.slice(-4)}`;
+  return "[REDACTED]";
 }
 
 /** Maps our provider-agnostic messages into Anthropic's `system` + `messages` shape.
@@ -124,7 +123,7 @@ function toLLMResponse(message: Anthropic.Message): LLMResponse {
     text,
     toolCalls,
     stopReason: mapStopReason(message.stop_reason),
-    raw: message,
+    raw: { ...message, pramaanProvider: "anthropic" },
   };
 }
 

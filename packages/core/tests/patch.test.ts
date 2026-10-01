@@ -11,6 +11,9 @@ import { computeFingerprint } from "../src/fingerprint.js";
 import { proposePatch, applyPatch } from "../src/patch/apply.js";
 import { checkPolicy, computeProtectedManifest, type PolicyContext } from "../src/patch/policy.js";
 import { applyOp, type ApplyOpContext } from "../src/patch/ops.js";
+import { falseUrgency } from "../src/detectors/falseUrgency.js";
+import { runDetectorsWithWarnings } from "../src/detectors/index.js";
+import { gate2Preservation, gate5NoRegression, verifyFinding } from "../src/verify/gates.js";
 import type { Finding, PatchProposal, PatternId, RuleId, SourceLocation } from "../src/types.js";
 
 const FIXTURES_ROOT = path.resolve(__dirname, "../../../fixtures");
@@ -101,6 +104,30 @@ async function setupFixture(name: string, auditId: string) {
   const model = await buildProjectModel(workspace.root, config);
   return { fixtureDir, config, workspace, model };
 }
+
+it("removes only the f06 countdown display and preserves the basket and shopper controls", async () => {
+  const { workspace, config, model } = await setupFixture("f06-mitti-mart", `timer-target-${Date.now()}`);
+  try {
+    const finding = falseUrgency(model, config)[0]!;
+    const proposal = proposePatch({ finding, strategy: "timer.remove_display", params: {}, projectModel: model, config });
+    const result = await applyPatch(workspace, proposal, config, basePolicyCtx(workspace, model, config, finding));
+    expect(result.applied).toBe(true);
+    const source = await readFile(path.join(workspace.root, finding.location.file), "utf8");
+    expect(source).not.toContain("Offer expires in");
+    expect(source).toContain("Organic Coffee — ₹799");
+    expect(source).toContain("No thanks");
+    expect(source).toContain("Proceed to payment");
+    expect(source).toContain("checked={protection}");
+    const current = await buildProjectModel(workspace.root, config);
+    expect(falseUrgency(current, config)).toHaveLength(0);
+    expect(gate2Preservation(current, config, computeProtectedManifest(model, config), finding, proposal).status).toBe("pass");
+    const before = runDetectorsWithWarnings({model, config});
+    const after = runDetectorsWithWarnings({model: current, config});
+    expect(gate5NoRegression(after.findings, after.warnings, before.findings, before.warnings, proposal).status).toBe("pass");
+    const verified = await verifyFinding({ auditId: workspace.auditId, findingId: finding.findingId, finding, workspace, config, baselineManifest: computeProtectedManifest(model, config), baselineFindings: before.findings, baselineWarnings: before.warnings, appliedProposal: proposal });
+    expect(verified.verdict).toBe("VERIFIED");
+  } finally { await removeWorkspace(workspace); }
+}, 30000);
 
 describe("T-PT F01 checkbox.default_off — SET_INITIAL_STATE_LITERAL", () => {
   let workspace: Workspace;

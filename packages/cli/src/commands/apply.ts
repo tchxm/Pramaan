@@ -36,6 +36,13 @@ export async function runApply(projectRoot: string, auditId: string, opts: { yes
     console.error(`Audit ${auditId} has already been applied`);
     return 2;
   }
+  const unchecked = state.proposals.some(proposal =>
+    state.results.some(result => result.proposalId === proposal.proposalId && result.applied) &&
+    !state.audit.findings.some(finding => finding.findingId === proposal.findingId && ["verified", "static_verified"].includes(finding.status)));
+  if (!["completed", "completed_with_failures"].includes(state.audit.status) || unchecked) {
+    console.error("Complete verification for every applied patch before writing changes to the project.");
+    return 3;
+  }
   if (!(await pathExists(state.workspaceRoot))) {
     console.error(`Audit ${auditId} has no workspace to apply yet`);
     return 3;
