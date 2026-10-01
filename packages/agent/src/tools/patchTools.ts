@@ -7,7 +7,7 @@ import { exec as execCb } from "node:child_process";
 import { promisify } from "node:util";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { ok, fail, proposePatch, applyPatch } from "@pramaan/core";
+import { ok, fail, zodIssues, proposePatch, applyPatch } from "@pramaan/core";
 import type { Result, ApprovalRequest, PatchOp } from "@pramaan/core";
 import type { AgentToolContext } from "./context.js";
 import { sha256OfText } from "../approvals.js";
@@ -24,7 +24,7 @@ export const patchProposeSchema = z.object({
 
 export async function patchProposeHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = patchProposeSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for patch.propose", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for patch.propose", { issues: zodIssues(parsed.error) });
 
   const finding = ctx.findings.get(parsed.data.findingId);
   if (!finding) return fail("E_NOT_FOUND", `no finding "${parsed.data.findingId}"`);
@@ -53,7 +53,7 @@ export const approvalRequestSchema = z.object({ findingId: z.string(), proposalI
 
 export async function approvalRequestHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = approvalRequestSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for approval.request", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for approval.request", { issues: zodIssues(parsed.error) });
 
   const finding = ctx.findings.get(parsed.data.findingId);
   if (!finding) return fail("E_NOT_FOUND", `no finding "${parsed.data.findingId}"`);
@@ -108,7 +108,7 @@ export const patchApplySchema = z.object({ proposalId: z.string(), approvalId: z
 
 export async function patchApplyHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = patchApplySchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for patch.apply", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for patch.apply", { issues: zodIssues(parsed.error) });
 
   const proposal = ctx.proposals.get(parsed.data.proposalId);
   if (!proposal) return fail("E_NOT_FOUND", `no proposal "${parsed.data.proposalId}"`);

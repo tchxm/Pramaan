@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { err } from "./errors.js";
+import { err, zodIssues } from "./errors.js";
 
 const checkoutStepSchema = z.object({
   name: z.string(),
@@ -49,7 +49,7 @@ export async function loadConfig(configPath: string): Promise<PramaanConfig> {
   const parsed = configSchema.safeParse(json);
   if (!parsed.success) {
     throw err("E_CONFIG_INVALID", `Config at ${configPath} failed validation`, {
-      issues: parsed.error.issues,
+      issues: zodIssues(parsed.error),
     });
   }
 

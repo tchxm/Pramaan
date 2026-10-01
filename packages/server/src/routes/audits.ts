@@ -8,6 +8,7 @@ import {
   buildEvidencePack,
   renderReportHtml,
   err,
+  zodIssues,
   pathExists,
   loadConfig,
   buildProjectModel,
@@ -76,7 +77,7 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
   app.post("/api/audits", async (request, reply) => {
     const parsed = createAuditSchema.safeParse(request.body);
     if (!parsed.success) {
-      sendError(reply, "E_BAD_INPUT", "Invalid POST /api/audits body", { issues: parsed.error.issues });
+      sendError(reply, "E_BAD_INPUT", "Invalid POST /api/audits body", { issues: zodIssues(parsed.error) });
       return;
     }
     const { source, options } = parsed.data;
@@ -198,7 +199,7 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
     requireAudit(store, id);
     const parsed = approvalDecisionSchema.safeParse(request.body);
     if (!parsed.success) {
-      sendError(reply, "E_BAD_INPUT", "Invalid approval decision body", { issues: parsed.error.issues });
+      sendError(reply, "E_BAD_INPUT", "Invalid approval decision body", { issues: zodIssues(parsed.error) });
       return;
     }
     try {
@@ -219,7 +220,7 @@ export function registerAuditRoutes(app: FastifyInstance, store: AuditStore): vo
     const record = requireAudit(store, id);
     const parsed = applySchema.safeParse(request.body);
     if (!parsed.success) {
-      sendError(reply, "E_BAD_INPUT", "apply requires { confirm: true }", { issues: parsed.error.issues });
+      sendError(reply, "E_BAD_INPUT", "apply requires { confirm: true }", { issues: zodIssues(parsed.error) });
       return;
     }
     if (store.isApplied(id)) {

@@ -7,7 +7,7 @@ import path from "node:path";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { ok, fail } from "@pramaan/core";
+import { ok, fail, zodIssues } from "@pramaan/core";
 import type { Result } from "@pramaan/core";
 import type { AgentToolContext } from "./context.js";
 
@@ -86,7 +86,7 @@ export const listFilesSchema = z.object({ glob: z.string().optional() });
 
 export async function listFilesHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = listFilesSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for project.list_files", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for project.list_files", { issues: zodIssues(parsed.error) });
 
   const all: string[] = [];
   await walkAll(ctx.workspace.root, ctx.workspace.root, all);
@@ -114,7 +114,7 @@ export const sourceReadSchema = z.object({
 
 export async function sourceReadHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = sourceReadSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for source.read", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for source.read", { issues: zodIssues(parsed.error) });
 
   const resolved = resolveWorkspacePath(ctx, parsed.data.path);
   if (!resolved) return fail("E_PATH_NOT_ALLOWED", `path "${parsed.data.path}" is not allowed`);
@@ -154,7 +154,7 @@ export const sourceSearchSchema = z.object({
 
 export async function sourceSearchHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = sourceSearchSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for source.search", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for source.search", { issues: zodIssues(parsed.error) });
 
   let re: RegExp;
   try {

@@ -6,7 +6,7 @@
 // Finding.evidence itself is treated elsewhere in the engine).
 
 import { z } from "zod";
-import { ok, fail, resolveStyle, resolveBackgroundColor } from "@pramaan/core";
+import { ok, fail, zodIssues, resolveStyle, resolveBackgroundColor } from "@pramaan/core";
 import type { Result, ProjectModel, JsxElementNode, SourceLocation, ComponentModel } from "@pramaan/core";
 import type { CascadeContext } from "@pramaan/core";
 import { extractLiteralAmounts, extractIdentifierAmounts, parseFeeConstants, parseLocalNumericConsts, findFeeItems, allDisplayedAmounts } from "@pramaan/core";
@@ -61,7 +61,7 @@ export const astInspectSchema = z.object({ path: z.string() });
 
 export async function astInspectHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = astInspectSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for ast.inspect", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for ast.inspect", { issues: zodIssues(parsed.error) });
 
   const model = await ctx.getProjectModel();
   const file = model.files.find((f) => f.path === parsed.data.path);
@@ -119,7 +119,7 @@ export const cssCascadeSchema = z.object({ fingerprint: z.string() });
 
 export async function cssCascadeHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = cssCascadeSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for css.cascade", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for css.cascade", { issues: zodIssues(parsed.error) });
 
   const finding = [...ctx.findings.values()].find((f) => f.fingerprint === parsed.data.fingerprint);
   if (!finding) return fail("E_NOT_FOUND", `no finding with fingerprint "${parsed.data.fingerprint}"`);

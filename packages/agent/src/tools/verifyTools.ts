@@ -5,7 +5,7 @@
 // and it only does so by reading the real VerifyResult the engine returns.
 
 import { z } from "zod";
-import { ok, fail, verifyFinding, buildEvidencePack, writeReportBundle } from "@pramaan/core";
+import { ok, fail, zodIssues, verifyFinding, buildEvidencePack, writeReportBundle } from "@pramaan/core";
 import type { Result } from "@pramaan/core";
 import type { AgentToolContext } from "./context.js";
 
@@ -15,7 +15,7 @@ export const detectorVerifySchema = z.object({ findingId: z.string() });
 
 export async function detectorVerifyHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = detectorVerifySchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for detector.verify", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for detector.verify", { issues: zodIssues(parsed.error) });
 
   const finding = ctx.findings.get(parsed.data.findingId);
   if (!finding) return fail("E_NOT_FOUND", `no finding "${parsed.data.findingId}"`);
@@ -65,7 +65,7 @@ export const findingEscalateSchema = z.object({ findingId: z.string(), summary: 
 
 export async function findingEscalateHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = findingEscalateSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for finding.escalate", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for finding.escalate", { issues: zodIssues(parsed.error) });
 
   const finding = ctx.findings.get(parsed.data.findingId);
   if (!finding) return fail("E_NOT_FOUND", `no finding "${parsed.data.findingId}"`);

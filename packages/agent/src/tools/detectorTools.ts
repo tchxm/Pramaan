@@ -3,7 +3,7 @@
 
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { ok, fail, runDetectorsWithWarnings, findConfirmShamingCandidates, lookupRegulation, computeFingerprint } from "@pramaan/core";
+import { ok, fail, zodIssues, runDetectorsWithWarnings, findConfirmShamingCandidates, lookupRegulation, computeFingerprint } from "@pramaan/core";
 import type { Result, Finding, PatternId } from "@pramaan/core";
 import type { AgentToolContext } from "./context.js";
 
@@ -13,7 +13,7 @@ export const detectorScanSchema = z.object({ paths: z.array(z.string()).optional
 
 export async function detectorScanHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = detectorScanSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for detector.scan", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for detector.scan", { issues: zodIssues(parsed.error) });
 
   const model = await ctx.getProjectModel();
   const { findings, warnings } = runDetectorsWithWarnings({ model, config: ctx.config });
@@ -90,7 +90,7 @@ async function resolveCandidateContext(
 
 export async function semanticInspectHandler(input: unknown, ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = semanticInspectSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for semantic.inspect", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for semantic.inspect", { issues: zodIssues(parsed.error) });
 
   const candidate = await resolveCandidateContext(ctx, parsed.data.findingId);
   if (!candidate) return fail("E_NOT_FOUND", `no confirm-shaming candidate for findingId "${parsed.data.findingId}"`);
@@ -152,7 +152,7 @@ export const regulationLookupSchema = z.object({
 
 export async function regulationLookupHandler(input: unknown, _ctx: AgentToolContext): Promise<Result<unknown>> {
   const parsed = regulationLookupSchema.safeParse(input);
-  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for regulation.lookup", { issues: parsed.error.issues });
+  if (!parsed.success) return fail("E_BAD_INPUT", "invalid input for regulation.lookup", { issues: zodIssues(parsed.error) });
   try {
     const refs = await lookupRegulation(parsed.data.pattern);
     return ok(refs);

@@ -11,9 +11,11 @@
 import { AnthropicLLMClient } from "./anthropic.js";
 import type { LLMClient, LLMCompleteOptions, LLMMessage, LLMResponse, LLMToolDefinition } from "./client.js";
 import { LLMUnavailableError } from "./client.js";
+import { CloudflareLLMClient } from "./cloudflare.js";
 import { createFallbackClient } from "./fallback.js";
 import { GeminiLLMClient } from "./gemini.js";
 import { GroqLLMClient } from "./groq.js";
+import { OpenRouterLLMClient } from "./openrouter.js";
 
 /**
  * Resolves the Anthropic API key. Spec 6.1 names the env var
@@ -27,6 +29,17 @@ function resolveAnthropicKey(): string | undefined {
 
 function resolveGroqKey(): string | undefined {
   return process.env.GROQ_API_KEY || undefined;
+}
+
+function resolveOpenRouterKey(): string | undefined {
+  return process.env.OPENROUTER_API_KEY || undefined;
+}
+
+function resolveCloudflare(): { token: string; accountId: string } | undefined {
+  const token = process.env.CLOUDFLARE_API_TOKEN;
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  if (!token || !accountId) return undefined;
+  return { token, accountId };
 }
 
 /** Free-tier, no-credit-card provider. Spec 6.1 doesn't name this env var
@@ -56,25 +69,70 @@ class UnconfiguredLLMClient implements LLMClient {
   }
 }
 
+type ProviderName = "anthropic" | "gemini" | "groq" | "openrouter" | "cloudflare";
+
+const DEFAULT_PROVIDER_ORDER: ProviderName[] = ["anthropic", "gemini", "groq", "openrouter", "cloudflare"];
+
+function resolveProviderOrder(): ProviderName[] {
+  const raw = process.env.PRAMAAN_LLM_PROVIDERS;
+  if (!raw) return DEFAULT_PROVIDER_ORDER;
+  const requested = raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter((s): s is ProviderName => (DEFAULT_PROVIDER_ORDER as string[]).includes(s));
+  if (requested.length === 0) return DEFAULT_PROVIDER_ORDER;
+  // Anything configured but not named in PRAMAAN_LLM_PROVIDERS still gets
+  // tried, after the explicitly-ordered ones — an unset env var should
+  // never silently disable a provider the user has a key for.
+  const remainder = DEFAULT_PROVIDER_ORDER.filter((p) => !requested.includes(p));
+  return [...requested, ...remainder];
+}
+
+function buildProvider(name: ProviderName): LLMClient | undefined {
+  switch (name) {
+    case "anthropic": {
+      const key = resolveAnthropicKey();
+      return key ? new AnthropicLLMClient({ apiKey: key }) : undefined;
+    }
+    case "gemini": {
+      const key = resolveGeminiKey();
+      return key ? new GeminiLLMClient({ apiKey: key }) : undefined;
+    }
+    case "groq": {
+      const key = resolveGroqKey();
+      return key ? new GroqLLMClient({ apiKey: key }) : undefined;
+    }
+    case "openrouter": {
+      const key = resolveOpenRouterKey();
+      return key ? new OpenRouterLLMClient({ apiKey: key }) : undefined;
+    }
+    case "cloudflare": {
+      const cf = resolveCloudflare();
+      return cf ? new CloudflareLLMClient({ apiKey: cf.token, accountId: cf.accountId }) : undefined;
+    }
+    default:
+      return undefined;
+  }
+}
+
 /**
  * Builds the default `LLMClient` for live mode: tries each configured
- * provider in priority order — Anthropic, then Gemini (free tier), then
- * Groq (free tier) — wired through nested `createFallbackClient` calls.
- * Any subset of keys may be set; unset providers are simply skipped. Safe
- * to call with no keys configured — it returns a client whose calls fail
- * loudly and clearly, rather than throwing at construction time.
+ * provider in priority order, wired through nested `createFallbackClient`
+ * calls. Order defaults to anthropic, gemini, groq, openrouter, cloudflare
+ * — overridable via `PRAMAAN_LLM_PROVIDERS` (comma-separated provider
+ * names; any configured provider not named there is still tried, after the
+ * named ones). Any subset of keys may be set; unset providers are simply
+ * skipped. Safe to call with no keys configured — it returns a client
+ * whose calls fail loudly and clearly, rather than throwing at
+ * construction time.
  */
 export function createDefaultLLMClient(): LLMClient {
   const providers: Array<{ name: string; client: LLMClient }> = [];
 
-  const anthropicKey = resolveAnthropicKey();
-  if (anthropicKey) providers.push({ name: "anthropic", client: new AnthropicLLMClient({ apiKey: anthropicKey }) });
-
-  const geminiKey = resolveGeminiKey();
-  if (geminiKey) providers.push({ name: "gemini", client: new GeminiLLMClient({ apiKey: geminiKey }) });
-
-  const groqKey = resolveGroqKey();
-  if (groqKey) providers.push({ name: "groq", client: new GroqLLMClient({ apiKey: groqKey }) });
+  for (const name of resolveProviderOrder()) {
+    const client = buildProvider(name);
+    if (client) providers.push({ name, client });
+  }
 
   if (providers.length === 0) return new UnconfiguredLLMClient();
 

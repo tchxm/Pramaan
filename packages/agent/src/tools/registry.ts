@@ -6,7 +6,7 @@
 // (sometimes verbose) JSON Schema output. See KNOWN RISKS in the handoff.
 
 import type { ZodTypeAny } from "zod";
-import { fail } from "@pramaan/core";
+import { fail, zodIssues } from "@pramaan/core";
 import type { Result, ErrorCode } from "@pramaan/core";
 import type { LLMToolDefinition } from "../llm/client.js";
 import type { AgentToolContext } from "./context.js";
@@ -104,11 +104,35 @@ export const toolRegistry: ToolRegistry = {
     schema: patchProposeSchema,
     jsonSchema: {
       type: "object",
-      properties: { findingId: STRING, strategy: STRING, params: { type: "object" } },
+      properties: {
+        findingId: STRING,
+        // The enum here is the complete, real set the engine accepts
+        // (packages/core/src/patch/strategies.ts's dispatcher) — without
+        // it, a model has no way to know valid strategy ids and will
+        // guess from prose elsewhere in its instructions (observed live:
+        // a model read "prefer strategy scope 'own_rule'" and sent
+        // strategy:"own_rule", which isn't a strategy at all — "own_rule"
+        // is a *params.scope* value for ii.normalize_reject_style).
+        strategy: {
+          type: "string",
+          enum: [
+            "checkbox.default_off",
+            "timer.remove_display",
+            "ii.normalize_reject_style",
+            "pricing.disclose_fee_early",
+            "text.replace_neutral",
+          ],
+        },
+        params: { type: "object" },
+      },
       required: ["findingId", "strategy"],
       additionalProperties: false,
     },
-    description: "Build a concrete patch proposal for a finding given a strategy id and params. Engine builds the actual ops.",
+    description:
+      "Build a concrete patch proposal for a finding given a strategy id and params. Engine builds the actual ops. " +
+      "checkbox.default_off: pre-selected checkbox findings. timer.remove_display: false-urgency countdown findings. " +
+      "ii.normalize_reject_style (params.scope: \"own_rule\" | \"winning_rule\"): interface-interference CSS findings. " +
+      "pricing.disclose_fee_early: drip-pricing findings. text.replace_neutral (requires prior approval.request): confirm-shaming wording findings.",
     handler: patchProposeHandler,
   },
   "approval.request": {
@@ -178,7 +202,7 @@ export async function dispatchToolCall(
   }
   const parsed = entry.schema.safeParse(rawInput);
   if (!parsed.success) {
-    return fail("E_BAD_INPUT" as ErrorCode, `invalid input for tool "${name}"`, { issues: parsed.error.issues });
+    return fail("E_BAD_INPUT" as ErrorCode, `invalid input for tool "${name}"`, { issues: zodIssues(parsed.error) });
   }
   try {
     return await entry.handler(rawInput, ctx);

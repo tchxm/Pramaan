@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { verifyEvidencePack, type EvidencePack, type TraceEvent } from "@pramaan/core";
+import { verifyEvidencePack, zodIssues, type EvidencePack, type TraceEvent } from "@pramaan/core";
 import { sendError } from "../errorHandler.js";
 
 const bodySchema = z.object({
@@ -12,7 +12,7 @@ export function registerEvidenceVerifyRoute(app: FastifyInstance): void {
   app.post("/api/evidence/verify", async (request, reply) => {
     const parsed = bodySchema.safeParse(request.body);
     if (!parsed.success) {
-      sendError(reply, "E_BAD_INPUT", "Invalid evidence verify request", { issues: parsed.error.issues });
+      sendError(reply, "E_BAD_INPUT", "Invalid evidence verify request", { issues: zodIssues(parsed.error) });
       return;
     }
 

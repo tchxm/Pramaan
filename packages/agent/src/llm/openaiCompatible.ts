@@ -29,7 +29,12 @@ function redactKey(key: string | undefined): string {
 
 interface OpenAIChatMessage {
   role: "system" | "user" | "assistant" | "tool";
-  content: string | null;
+  /** Always a string, never `null` — most providers accept null for an
+   * assistant message that only carries tool_calls, but Cloudflare's
+   * OpenAI-compat endpoint rejects it outright (confirmed live: "Type
+   * mismatch of '/messages/N/content', 'string' not in 'null'"). An empty
+   * string is accepted everywhere null would have been. */
+  content: string;
   tool_call_id?: string;
   name?: string;
   tool_calls?: Array<{
@@ -57,7 +62,7 @@ function toOpenAIMessages(messages: LLMMessage[]): OpenAIChatMessage[] {
       // role:"tool" message has a matching call id to attach to.
       return {
         role: "assistant",
-        content: m.content || null,
+        content: m.content || "",
         tool_calls: m.toolCalls.map((call) => ({
           id: call.id,
           type: "function" as const,
