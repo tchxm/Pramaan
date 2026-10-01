@@ -372,9 +372,10 @@
 
 .lp-gate__word {
   position: absolute;
-  top: 18%;
+  top: 50%;
   left: 5vw;
   right: 5vw;
+  transform: translateY(-50%);
   text-align: center;
   font-family: var(--font-heading);
   font-weight: 400;
@@ -387,32 +388,35 @@
 
 .lp-gate__robot {
   position: absolute;
-  top: 14%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: min(420px, 70vw);
-  height: min(420px, 42vh);
+  width: min(560px, 80vw, 58vh);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -58%);
   z-index: 1;
 }
 
 .lp-gate__log {
   position: absolute;
-  bottom: 140px;
+  bottom: 132px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(480px, 84vw);
+  width: min(560px, 90vw);
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-4);
   font-family: var(--ws-mono, "JetBrains Mono", monospace);
-  font-size: var(--text-xs);
+  font-size: 11px;
   color: var(--slate);
-  text-align: left;
+  text-align: center;
+  opacity: 0.75;
 }
 
 .lp-gate__start {
   position: absolute;
-  bottom: 68px;
+  bottom: 56px;
   left: 50%;
   transform: translateX(-50%);
   min-width: 180px;
