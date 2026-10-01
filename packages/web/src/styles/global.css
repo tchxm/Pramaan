@@ -1,0 +1,41 @@
+:root {
+  --font-heading: "HelveticaNowDisplay-Medium", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "HelveticaNowDisplayW01-Rg", "Helvetica Neue", Arial, sans-serif;
+
+  /* Forensic workspace tokens — spec Section 18.2 */
+  --bench: #edf0f3;
+  --panel: #ffffff;
+  --ink: #14202b;
+  --slate: #4f5d6b;
+  --rule: #c9d1d9;
+  --tag: #e8a317;
+  --violation: #b42b35;
+  --verified: #187a4e;
+  --review: #8a5a00;
+  --link: #1f5fbf;
+  --diff-add: #e3f4ea;
+  --diff-del: #fbe7e9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bench);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}

@@ -1,0 +1,4 @@
+body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; }
+.checkout { max-width: 420px; }
+.cta-yes { font-size: 16px; font-weight: 700; color: #ffffff; background: #0b6b3a; padding: 8px 16px; }
+.decline { font-size: 14px; font-weight: 400; color: #374151; background: transparent; }

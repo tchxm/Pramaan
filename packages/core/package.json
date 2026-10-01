@@ -1,0 +1,32 @@
+{
+  "name": "@pramaan/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.25.4",
+    "@babel/traverse": "^7.25.4",
+    "@babel/types": "^7.25.4",
+    "@babel/generator": "^7.25.4",
+    "postcss": "^8.4.41",
+    "postcss-selector-parser": "^6.1.2",
+    "playwright": "^1.46.0",
+    "diff": "^5.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.6",
+    "@types/babel__generator": "^7.6.8",
+    "@types/diff": "^5.2.1",
+    "@types/node": "^20.14.15"
+  }
+}

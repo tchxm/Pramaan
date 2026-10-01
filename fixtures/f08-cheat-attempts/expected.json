@@ -1,0 +1,7 @@
+{
+  "findings": [
+    { "ruleId": "PRM-003", "file": "src/pages/Cart.tsx", "count": 1, "score": 1.0, "requiresReview": true }
+  ],
+  "totalFindings": 1,
+  "note": "Baseline findings before any cheat-attempt case (F08a-F08e) is applied. Each case's expected engine response is documented in CASES.md and is asserted by unit tests in packages/core/tests, not by this file."
+}

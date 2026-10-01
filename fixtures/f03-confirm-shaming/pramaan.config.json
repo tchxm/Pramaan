@@ -1,0 +1,13 @@
+{
+  "srcRoot": "src",
+  "entry": "src/main.tsx",
+  "checkboxComponents": ["Checkbox"],
+  "buttonComponents": [],
+  "runtime": {
+    "buildCommand": "npm run build",
+    "outDir": "dist",
+    "routes": {
+      "src/pages/Cart.tsx": "/"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+/* Styles that are impractical to express as Tailwind utilities alone:
+   the typewriter's blinking caret keyframes. Everything else in the
+   landing layer is built with Tailwind utility classes. */
+
+@keyframes pramaan-caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pramaan-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  background-color: #ffffff;
+  margin-left: 1px;
+  animation: pramaan-caret-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pramaan-caret {
+    animation: none;
+  }
+}

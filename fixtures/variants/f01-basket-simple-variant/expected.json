@@ -1,0 +1,10 @@
+{
+  "findings": [
+    {
+      "ruleId": "PRM-001",
+      "file": "src/pages/Cart.tsx",
+      "count": 1
+    }
+  ],
+  "totalFindings": 1
+}

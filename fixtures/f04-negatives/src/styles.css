@@ -1,0 +1,4 @@
+body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; }
+.page > * { margin-bottom: 16px; }
+.cta-yes { font-size: 18px; font-weight: 700; color: #ffffff; background: #0b6b3a; padding: 8px 16px; }
+.decline { font-size: 15px; font-weight: 400; color: #374151; opacity: 1; background: transparent; }

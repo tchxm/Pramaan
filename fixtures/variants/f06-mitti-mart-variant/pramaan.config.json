@@ -1,0 +1,23 @@
+{
+  "srcRoot": "src",
+  "entry": "src/main.tsx",
+  "checkboxComponents": ["Checkbox"],
+  "buttonComponents": [],
+  "checkoutFlow": {
+    "steps": [
+      { "name": "product", "file": "src/pages/Product.tsx", "route": "/" },
+      { "name": "cart", "file": "src/pages/Cart.tsx", "route": "/cart" },
+      { "name": "payment", "file": "src/pages/Payment.tsx", "route": "/payment" }
+    ]
+  },
+  "feeConstants": { "handling": 45, "addOn": 59 },
+  "runtime": {
+    "buildCommand": "npm run build",
+    "outDir": "dist",
+    "routes": {
+      "src/pages/Product.tsx": "/",
+      "src/pages/Cart.tsx": "/cart",
+      "src/pages/Payment.tsx": "/payment"
+    }
+  }
+}

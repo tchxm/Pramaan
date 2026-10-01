@@ -1,0 +1,6 @@
+{
+  "findings": [
+    { "ruleId": "PRM-004", "file": "src/pages/Payment.tsx", "count": 1, "firstVisibleStep": "payment" }
+  ],
+  "totalFindings": 1
+}

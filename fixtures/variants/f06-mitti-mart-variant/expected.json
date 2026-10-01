@@ -1,0 +1,29 @@
+{
+  "findings": [
+    {
+      "ruleId": "PRM-001",
+      "file": "src/pages/Cart.tsx",
+      "count": 1
+    },
+    {
+      "ruleId": "PRM-002",
+      "file": "src/pages/Cart.tsx",
+      "count": 1,
+      "severity": "high"
+    },
+    {
+      "ruleId": "PRM-003",
+      "file": "src/pages/Cart.tsx",
+      "count": 1,
+      "score": 1,
+      "requiresReview": true
+    },
+    {
+      "ruleId": "PRM-004",
+      "file": "src/pages/Payment.tsx",
+      "count": 1,
+      "firstVisibleStep": "payment"
+    }
+  ],
+  "totalFindings": 4
+}
