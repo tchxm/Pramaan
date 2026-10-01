@@ -348,6 +348,16 @@
   -webkit-text-stroke: 1px rgba(78, 230, 184, 0.2);
 }
 
+.lp-gate__robot {
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 70vw);
+  height: min(420px, 42vh);
+  z-index: 1;
+}
+
 .lp-gate__log {
   position: absolute;
   bottom: 140px;

@@ -73,9 +73,9 @@ export default function MobileNavigation({ id, open, onClose, onNavigate }: Mobi
       aria-hidden={!open}
       className={`lp-mobile-nav${open ? " lp-mobile-nav--open" : ""}`}
     >
-      <a href="#how-it-works" onClick={onClose}>
+      <button type="button" onClick={() => onNavigate("/how-it-works")}>
         How it works
-      </a>
+      </button>
       <button type="button" onClick={() => onNavigate("/verify")}>
         Evidence
       </button>

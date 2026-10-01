@@ -207,6 +207,65 @@
   }
 }
 
+/* ---------- Demo tour ---------- */
+
+.ws-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+
+.ws-tour__ring {
+  position: fixed;
+  border: 2px solid var(--tag);
+  border-radius: 10px;
+  box-shadow: var(--glow);
+  pointer-events: none;
+  transition: top 0.15s ease, left 0.15s ease, width 0.15s ease, height 0.15s ease;
+}
+
+.ws-tour__card {
+  position: fixed;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  padding: var(--space-4);
+  background: var(--panel);
+  border: 1px solid var(--tag);
+  border-radius: 10px;
+  box-shadow: var(--glow);
+  pointer-events: auto;
+  transition: top 0.15s ease, left 0.15s ease;
+}
+
+.ws-tour__step {
+  font-family: var(--ws-mono, "JetBrains Mono", monospace);
+  font-size: var(--text-xs);
+  color: var(--tag);
+  margin: 0 0 var(--space-2);
+}
+
+.ws-tour__title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0 0 var(--space-2);
+  color: var(--ink);
+}
+
+.ws-tour__text {
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--slate);
+  margin: 0 0 var(--space-4);
+}
+
+.ws-tour__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
 /* ---------- S2 Workspace ---------- */
 
 .scr-workspace {

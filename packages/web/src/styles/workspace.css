@@ -806,89 +806,217 @@
   font-family: var(--ws-font);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-5);
+}
+
+.ws-pack-verifier__card {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .ws-pack-verifier__title {
-  font-size: 28px;
-  font-weight: 600;
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 400;
   color: var(--ink);
   margin: 0;
 }
 
 .ws-pack-verifier__intro {
   color: var(--slate);
-  font-size: 14px;
+  font-size: var(--text-base);
   margin: 0;
+  max-width: 60ch;
 }
 
 .ws-pack-verifier__dropzone {
-  border: 1px dashed var(--rule);
-  border-radius: 3px;
-  padding: 28px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  border: 2px dashed var(--rule);
+  border-radius: 10px;
+  padding: var(--space-7) var(--space-4);
   text-align: center;
   cursor: pointer;
-  background: var(--panel);
+  background: var(--bench);
   color: var(--slate);
-  font-size: 14px;
+  font-size: var(--text-base);
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ws-pack-verifier__dropzone:hover {
+  border-color: var(--tag);
 }
 
 .ws-pack-verifier__dropzone--active {
   border-color: var(--link);
-  background: var(--bench);
+  background: var(--panel-raised);
+  box-shadow: var(--glow);
+}
+
+.ws-pack-verifier__dropzone-icon {
+  color: var(--slate);
+  flex: none;
+}
+
+.ws-pack-verifier__dropzone--active .ws-pack-verifier__dropzone-icon {
+  color: var(--link);
+}
+
+.ws-pack-verifier__dropzone-text {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.ws-pack-verifier__dropzone-hint {
+  margin: 0;
+  color: var(--slate);
+  font-size: var(--text-xs);
 }
 
 .ws-pack-verifier__loaded {
   list-style: none;
-  margin: 10px 0 0 0;
+  margin: var(--space-2) 0 0 0;
   padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.ws-pack-verifier__loaded-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
   font-family: var(--ws-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
+  color: var(--slate);
+}
+
+.ws-pack-verifier__loaded-item--filled {
   color: var(--ink);
+  border-color: var(--tag);
 }
 
 .ws-pack-verifier__actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .ws-pack-verifier__verify-btn {
-  min-height: 32px;
-  padding: 0 16px;
+  min-height: 36px;
+  padding: 0 18px;
   border-radius: 3px;
   border: 1px solid var(--ink);
   background: var(--ink);
   color: var(--panel);
-  font-size: 13px;
+  font-size: var(--text-base);
+  font-weight: 500;
   cursor: pointer;
+}
+
+.ws-pack-verifier__verify-btn:hover:not(:disabled) {
+  background: var(--tag);
+  border-color: var(--tag);
 }
 
 .ws-pack-verifier__verify-btn:disabled {
   opacity: 0.5;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .ws-pack-verifier__reset-btn {
-  min-height: 32px;
-  padding: 0 12px;
+  min-height: 36px;
+  padding: 0 14px;
   border-radius: 3px;
   border: 1px solid var(--rule);
   background: var(--panel);
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--text-base);
   cursor: pointer;
 }
 
+.ws-pack-verifier__reset-btn:hover {
+  border-color: var(--ink);
+}
+
 .ws-pack-verifier__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: var(--violation);
-  font-size: 13px;
+  background: var(--diff-del);
+  border: 1px solid rgba(255, 129, 131, 0.35);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: var(--text-sm);
   margin: 0;
 }
 
 .ws-pack-verifier__result {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-4);
+}
+
+/* Verdict banner — the single most important fact on the page, so it reads
+   as a prominent bordered card, not a line of text. */
+.ws-pack-verifier__verdict {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  font-size: var(--text-md);
+  font-weight: 500;
+  margin: 0;
+}
+
+.ws-pack-verifier__verdict-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.ws-pack-verifier__verdict--pass {
+  color: var(--verified);
+  background: var(--diff-add);
+  border-color: var(--verified);
+  box-shadow: var(--glow);
+}
+
+.ws-pack-verifier__verdict--pass .ws-pack-verifier__verdict-icon {
+  background: rgba(78, 230, 184, 0.16);
+}
+
+.ws-pack-verifier__verdict--fail {
+  color: var(--violation);
+  background: var(--diff-del);
+  border-color: var(--violation);
+}
+
+.ws-pack-verifier__verdict--fail .ws-pack-verifier__verdict-icon {
+  background: rgba(255, 129, 131, 0.16);
+}
+
+.ws-pack-verifier__verdict-text {
+  color: var(--ink);
 }
 
 .ws-pack-verifier__checks {
@@ -897,52 +1025,71 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .ws-pack-verifier__check {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 12px;
+  background: var(--panel-raised);
   border: 1px solid var(--rule);
-  border-radius: 3px;
-  font-size: 13px;
+  border-radius: 8px;
+  font-size: var(--text-sm);
 }
 
-.ws-pack-verifier__check--pass {
-  color: var(--verified);
-}
-
-.ws-pack-verifier__check--fail {
-  color: var(--violation);
+.ws-pack-verifier__check-main {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .ws-pack-verifier__check-name {
   color: var(--ink);
+  font-weight: 500;
 }
 
 .ws-pack-verifier__check-detail {
   color: var(--slate);
-  margin-left: auto;
-  font-size: 12px;
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.ws-pack-verifier__overall {
-  font-size: 16px;
+/* Check-result pill — same visual language as .ws-status-pill: rounded,
+   tinted background per state, icon + text together (never color alone). */
+.ws-pack-verifier__check-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 18px;
+  border: 1px solid var(--rule);
+  font-size: var(--text-xs);
   font-weight: 500;
-  padding: 10px;
-  border-radius: 3px;
-  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
-.ws-pack-verifier__overall--pass {
+.ws-pack-verifier__check-pill-icon {
+  flex: none;
+  display: block;
+}
+
+.ws-pack-verifier__check-pill--pass {
   color: var(--verified);
+  border-color: var(--verified);
   background: var(--diff-add);
 }
 
-.ws-pack-verifier__overall--fail {
+.ws-pack-verifier__check-pill--fail {
   color: var(--violation);
+  border-color: var(--violation);
   background: var(--diff-del);
 }
 

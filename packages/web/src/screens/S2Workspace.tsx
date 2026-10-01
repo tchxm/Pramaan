@@ -3,7 +3,7 @@
 // not make (diff fetch, file fetch, approval resolution) and composes the
 // twenty workspace components around the live `useAuditStore` state.
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useAuditStore } from "../state/store.js";
 import { getAuditDiff, getAuditFile, resolveApproval, ApiError } from "../api/client.js";
 import type { ApprovalDecision } from "../components/workspace/ApprovalDrawer.js";
@@ -24,6 +24,7 @@ import { GatesPanel } from "../components/workspace/GatesPanel.js";
 import { TraceStrip } from "../components/workspace/TraceStrip.js";
 import { TraceDetail } from "../components/workspace/TraceDetail.js";
 import { ApprovalDrawer } from "../components/workspace/ApprovalDrawer.js";
+import DemoTour from "../components/workspace/DemoTour.js";
 import { useBreakpoint } from "./useMediaQuery.js";
 
 import "../styles/workspace.css";
@@ -35,6 +36,8 @@ type NarrowTab = "files" | "finding" | "evidence" | "trace";
 export default function S2Workspace(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const breakpoint = useBreakpoint();
+  const [searchParams] = useSearchParams();
+  const [tourActive, setTourActive] = useState(searchParams.get("tour") === "1");
 
   const store = useAuditStore();
   const {
@@ -418,6 +421,10 @@ export default function S2Workspace(): JSX.Element {
           />
           {approvalBusy ? <div className="scr-approval-busy-veil" aria-hidden="true" /> : null}
         </div>
+      ) : null}
+
+      {tourActive && findings.length > 0 && breakpoint === "wide" ? (
+        <DemoTour onFinish={() => setTourActive(false)} />
       ) : null}
     </div>
   );

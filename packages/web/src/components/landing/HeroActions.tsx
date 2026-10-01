@@ -14,11 +14,10 @@ function CopyIcon() {
 
 /**
  * Hero action pills. Every pill routes somewhere real via react-router's
- * useNavigate — none are dead buttons. "Watch the demo" / "See how
- * verification works" use query-param conventions on /audit:
- *   - ?fixture=f06-mitti-mart  -> auto-selects fixture F06
- *   - ?highlight=verification  -> intended to scroll/highlight the
- *     verification explanation once S1 supports it
+ * useNavigate — none are dead buttons. "Watch the demo" uses a query-param
+ * convention on /audit (?fixture=f06-mitti-mart auto-selects fixture F06).
+ * "See how verification works" goes to the real /how-it-works#verification
+ * deep section.
  */
 export default function HeroActions() {
   const navigate = useNavigate();
@@ -58,11 +57,11 @@ export default function HeroActions() {
         Start an audit
       </button>
 
-      <button type="button" onClick={() => navigate("/audit?fixture=f06-mitti-mart")} className="lp-pill">
+      <button type="button" onClick={() => navigate("/audit?fixture=f06-mitti-mart&tour=1")} className="lp-pill">
         Watch the demo
       </button>
 
-      <button type="button" onClick={() => navigate("/audit?highlight=verification")} className="lp-pill">
+      <button type="button" onClick={() => navigate("/how-it-works#verification")} className="lp-pill">
         See how verification works
       </button>
 

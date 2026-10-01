@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import BootRobot from "./BootRobot.js";
 
 /**
  * A boot/entry ceremony before the hero reveals itself — every line is a
@@ -81,6 +82,7 @@ export default function BootGate() {
       <div className="lp-gate__word" aria-hidden="true">
         Evidence
       </div>
+      <BootRobot />
       <div className="lp-gate__log" role="status" aria-live="polite">
         {lines.map((line) => (
           <div key={line}>{line}</div>

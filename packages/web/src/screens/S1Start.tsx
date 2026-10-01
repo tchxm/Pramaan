@@ -1,7 +1,7 @@
 // S1 Start — spec Section 18.3. "Audit a frontend project": pick a fixture,
 // set options, start an audit, land on S2 Workspace. Never computes
 // findings; only reads fixtures from the server and asks it to start a run.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   getFixtures,
@@ -40,6 +40,8 @@ export default function S1Start(): JSX.Element {
   const [startError, setStartError] = useState<string | null>(null);
 
   const requestedFixture = searchParams.get("fixture");
+  const tour = searchParams.get("tour") === "1";
+  const autoStartedRef = useRef(false);
 
   const load = (): void => {
     setLoadState("loading");
@@ -76,7 +78,7 @@ export default function S1Start(): JSX.Element {
       { runtime, maxAttempts, autoApprovePreview },
     )
       .then(({ auditId }) => {
-        navigate(`/audit/${auditId}`);
+        navigate(tour ? `/audit/${auditId}?tour=1` : `/audit/${auditId}`);
       })
       .catch((err: unknown) => {
         const message = err instanceof ApiError ? err.message : "Could not start the audit.";
@@ -84,6 +86,18 @@ export default function S1Start(): JSX.Element {
         setStarting(false);
       });
   };
+
+  // "Watch the demo" (?tour=1) auto-starts the audit once the requested
+  // fixture is loaded and selected, so a judge sees the real workspace
+  // immediately instead of having to click Start themselves.
+  useEffect(() => {
+    if (!tour || autoStartedRef.current) return;
+    if (loadState !== "ready" || !selectedId) return;
+    if (requestedFixture && selectedId !== requestedFixture) return;
+    autoStartedRef.current = true;
+    onStart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tour, loadState, selectedId, requestedFixture]);
 
   if (loadState === "error" && error) {
     return (

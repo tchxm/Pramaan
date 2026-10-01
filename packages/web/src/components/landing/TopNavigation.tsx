@@ -7,10 +7,10 @@ import MobileNavigation from "./MobileNavigation.js";
  * CTA; below the mobile breakpoint it collapses to a hamburger that opens
  * MobileNavigation.
  *
- * NOTE on "How it works" / "Documentation": neither an in-app explanation
- * screen nor a docs site exists yet. Both links scroll to the in-page
- * "#how-it-works" hero section rather than pointing at a route or URL that
- * doesn't exist.
+ * NOTE on "Documentation": no docs site exists yet, so that link still
+ * scrolls to the in-page "#how-it-works" hero section rather than pointing
+ * at a URL that doesn't exist. "How it works" itself routes to the real
+ * /how-it-works page.
  */
 export default function TopNavigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -39,7 +39,7 @@ export default function TopNavigation() {
         </Link>
 
         <nav aria-label="Primary" className="lp-nav__links">
-          <a href="#how-it-works">How it works</a>
+          <Link to="/how-it-works">How it works</Link>
           <Link to="/verify">Evidence</Link>
           <a href="#how-it-works">Documentation</a>
         </nav>

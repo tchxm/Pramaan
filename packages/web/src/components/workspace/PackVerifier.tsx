@@ -32,6 +32,21 @@ function FailIcon(): JSX.Element {
   );
 }
 
+function DropIcon(): JSX.Element {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path
+        d="M9 22.5a5.5 5.5 0 0 1-1-10.92 7 7 0 0 1 13.58-2.3A5.5 5.5 0 0 1 23 20.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M16 14v10M16 14l-3.5 3.5M16 14l3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /**
  * S5 "Verify a pack" — fully self-contained (no props), suitable as the
  * `/verify` route's entire content. Accepts evidence-pack.json by drag/drop
@@ -109,98 +124,112 @@ export function PackVerifier(): JSX.Element {
 
   return (
     <div className="ws-pack-verifier">
-      <h2 className="ws-pack-verifier__title">Verify a pack</h2>
-      <p className="ws-pack-verifier__intro">
-        Drop <span className="ws-mono">evidence-pack.json</span> (and optionally{" "}
-        <span className="ws-mono">trace.jsonl</span>) to recompute every check independently.
-      </p>
+      <div className="ws-pack-verifier__card">
+        <h2 className="ws-pack-verifier__title">Verify a pack</h2>
+        <p className="ws-pack-verifier__intro">
+          Drop <span className="ws-mono">evidence-pack.json</span> (and optionally{" "}
+          <span className="ws-mono">trace.jsonl</span>) to recompute every check independently.
+        </p>
 
-      <div
-        className={`ws-pack-verifier__dropzone${dragOver ? " ws-pack-verifier__dropzone--active" : ""}`}
-        data-testid="pack-dropzone"
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setDragOver(false);
-          void ingest(e.dataTransfer.files);
-        }}
-        onClick={() => inputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+        <div
+          className={`ws-pack-verifier__dropzone${dragOver ? " ws-pack-verifier__dropzone--active" : ""}`}
+          data-testid="pack-dropzone"
+          onDragOver={(e) => {
             e.preventDefault();
-            inputRef.current?.click();
-          }
-        }}
-        aria-label="Drop evidence-pack.json and optionally trace.jsonl, or press Enter to choose files"
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".json,.jsonl"
-          multiple
-          style={{ display: "none" }}
-          onChange={(e) => void ingest(e.target.files)}
-        />
-        <p>Drop files here, or click to choose</p>
-        <ul className="ws-pack-verifier__loaded">
-          <li>{files.packName ? `Pack: ${files.packName}` : "Pack: none loaded"}</li>
-          <li>{files.traceName ? `Trace: ${files.traceName}` : "Trace: none loaded (optional)"}</li>
-        </ul>
-      </div>
-
-      {localError ? (
-        <p className="ws-pack-verifier__error" role="alert">
-          {localError}
-        </p>
-      ) : null}
-
-      <div className="ws-pack-verifier__actions">
-        <button
-          type="button"
-          className="ws-pack-verifier__verify-btn"
-          disabled={!files.pack || verifying}
-          onClick={() => void runVerify()}
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            void ingest(e.dataTransfer.files);
+          }}
+          onClick={() => inputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
+          aria-label="Drop evidence-pack.json and optionally trace.jsonl, or press Enter to choose files"
         >
-          {verifying ? "Verifying…" : "Verify pack"}
-        </button>
-        <button type="button" className="ws-pack-verifier__reset-btn" onClick={reset}>
-          Clear
-        </button>
-      </div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".json,.jsonl"
+            multiple
+            style={{ display: "none" }}
+            onChange={(e) => void ingest(e.target.files)}
+          />
+          <span className="ws-pack-verifier__dropzone-icon">
+            <DropIcon />
+          </span>
+          <p className="ws-pack-verifier__dropzone-text">Drop files here, or click to choose</p>
+          <p className="ws-pack-verifier__dropzone-hint">evidence-pack.json required · trace.jsonl optional</p>
+          <ul className="ws-pack-verifier__loaded">
+            <li className={`ws-pack-verifier__loaded-item${files.packName ? " ws-pack-verifier__loaded-item--filled" : ""}`}>
+              {files.packName ? `Pack: ${files.packName}` : "Pack: none loaded"}
+            </li>
+            <li className={`ws-pack-verifier__loaded-item${files.traceName ? " ws-pack-verifier__loaded-item--filled" : ""}`}>
+              {files.traceName ? `Trace: ${files.traceName}` : "Trace: none loaded (optional)"}
+            </li>
+          </ul>
+        </div>
 
-      {apiError ? (
-        <p className="ws-pack-verifier__error" role="alert">
-          {apiError}
-        </p>
-      ) : null}
+        {localError ? (
+          <p className="ws-pack-verifier__error" role="alert">
+            {localError}
+          </p>
+        ) : null}
+
+        <div className="ws-pack-verifier__actions">
+          <button
+            type="button"
+            className="ws-pack-verifier__verify-btn"
+            disabled={!files.pack || verifying}
+            onClick={() => void runVerify()}
+          >
+            {verifying ? "Verifying…" : "Verify pack"}
+          </button>
+          <button type="button" className="ws-pack-verifier__reset-btn" onClick={reset}>
+            Clear
+          </button>
+        </div>
+
+        {apiError ? (
+          <p className="ws-pack-verifier__error" role="alert">
+            {apiError}
+          </p>
+        ) : null}
+      </div>
 
       {result ? (
         <div className="ws-pack-verifier__result">
+          <p
+            className={`ws-pack-verifier__verdict ws-pack-verifier__verdict--${result.valid ? "pass" : "fail"}`}
+            role="status"
+          >
+            <span className="ws-pack-verifier__verdict-icon">{result.valid ? <PassIcon /> : <FailIcon />}</span>
+            <span className="ws-pack-verifier__verdict-text">{overallMessage}</span>
+          </p>
           <ul className="ws-pack-verifier__checks">
             {result.checks.map((check) => (
-              <li
-                key={check.name}
-                className={`ws-pack-verifier__check ws-pack-verifier__check--${check.pass ? "pass" : "fail"}`}
-              >
-                <span className="ws-pack-verifier__check-icon">{check.pass ? <PassIcon /> : <FailIcon />}</span>
-                <span className="ws-pack-verifier__check-name ws-mono">{check.name}</span>
-                <span className="ws-pack-verifier__check-status">{check.pass ? "Pass" : "Fail"}</span>
-                {check.detail ? <span className="ws-pack-verifier__check-detail">{check.detail}</span> : null}
+              <li key={check.name} className="ws-pack-verifier__check">
+                <span className="ws-pack-verifier__check-main">
+                  <span className="ws-pack-verifier__check-name ws-mono">{check.name}</span>
+                  {check.detail ? <span className="ws-pack-verifier__check-detail">{check.detail}</span> : null}
+                </span>
+                <span
+                  className={`ws-pack-verifier__check-pill ws-pack-verifier__check-pill--${check.pass ? "pass" : "fail"}`}
+                >
+                  <span className="ws-pack-verifier__check-pill-icon">{check.pass ? <PassIcon /> : <FailIcon />}</span>
+                  {check.pass ? "Pass" : "Fail"}
+                </span>
               </li>
             ))}
           </ul>
-          <p
-            className={`ws-pack-verifier__overall ws-pack-verifier__overall--${result.valid ? "pass" : "fail"}`}
-            role="status"
-          >
-            {overallMessage}
-          </p>
         </div>
       ) : null}
     </div>

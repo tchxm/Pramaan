@@ -10,6 +10,7 @@ const S1Start = lazy(() => import("./screens/S1Start.js"));
 const S2Workspace = lazy(() => import("./screens/S2Workspace.js"));
 const S4Outcome = lazy(() => import("./screens/S4Outcome.js"));
 const S5Verify = lazy(() => import("./screens/S5Verify.js"));
+const HowItWorks = lazy(() => import("./screens/HowItWorks.js"));
 
 function RouteFallback() {
   return <div style={{ padding: 24 }}>Loading…</div>;
@@ -48,6 +49,14 @@ export default function App() {
         element={
           <Suspense fallback={<RouteFallback />}>
             <S5Verify />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/how-it-works"
+        element={
+          <Suspense fallback={<RouteFallback />}>
+            <HowItWorks />
           </Suspense>
         }
       />
