@@ -1,0 +1,86 @@
+{
+  "schema": "pramaan.evidence/1",
+  "audit": {
+    "auditId": "PRM-2026-000003",
+    "projectName": "tampered-project-name",
+    "startedAt": "2026-10-01T10:20:17.760Z",
+    "engineVersion": "0.1.0",
+    "configHash": "ddafb9e33672e3ecacdcb788f97ed6e4f18be4e313fe146f35ba797ae733825e",
+    "filesScanned": 4,
+    "before": {
+      "total": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "after": {
+      "total": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "findings": [],
+    "status": "completed"
+  },
+  "engine": {
+    "version": "0.1.0",
+    "node": "v22.18.0",
+    "playwright": "unknown",
+    "regulationDataVersion": "unknown"
+  },
+  "llm": {
+    "provider": "none",
+    "model": "unknown",
+    "temperature": 0,
+    "mode": "live"
+  },
+  "config": {
+    "srcRoot": "src",
+    "entry": "src/main.tsx",
+    "checkboxComponents": [
+      "Checkbox"
+    ],
+    "buttonComponents": [],
+    "currency": [
+      "₹",
+      "Rs",
+      "INR"
+    ],
+    "runtime": {
+      "buildCommand": "npm run build",
+      "outDir": "dist",
+      "routes": {
+        "src/pages/Cart.tsx": "/"
+      }
+    },
+    "configHash": "ddafb9e33672e3ecacdcb788f97ed6e4f18be4e313fe146f35ba797ae733825e"
+  },
+  "files": [
+    {
+      "path": "src/main.tsx",
+      "sha256Before": "ae2b64dd02c32e5b3f27d7b8c1eb35fcc7f11392e75537a717d358ed7b39256e",
+      "sha256After": "ae2b64dd02c32e5b3f27d7b8c1eb35fcc7f11392e75537a717d358ed7b39256e"
+    },
+    {
+      "path": "src/pages/Cart.tsx",
+      "sha256Before": "445bcf1eca5d24f057bd5a0012a4291a44ab06971890ba0261fa08b64af71ed5",
+      "sha256After": "445bcf1eca5d24f057bd5a0012a4291a44ab06971890ba0261fa08b64af71ed5"
+    },
+    {
+      "path": "src/styles.css",
+      "sha256Before": "8d3079589ceeac0025509762c6cc11229227cd601c969e1554ab3ae7cb1ac4af",
+      "sha256After": "8d3079589ceeac0025509762c6cc11229227cd601c969e1554ab3ae7cb1ac4af"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256Before": "eca485c281977125366d4800553256e419f364984e615f75a2d2bae54f7857fd",
+      "sha256After": "eca485c281977125366d4800553256e419f364984e615f75a2d2bae54f7857fd"
+    }
+  ],
+  "findings": [],
+  "artifacts": [],
+  "traceHead": "7643efde96bd2b5fb9159227dbe20faded829e128106209fc42668d8d26ca3eb",
+  "disclaimer": "Pramaan identifies technical patterns associated with deceptive interfaces, maps them to relevant regulatory guidance, and produces evidence supporting a self-audit. It does not provide legal certification.",
+  "generatedAt": "2026-10-01T10:20:17.832Z",
+  "evidenceHash": "73a9aff2581dc8ef6d4fe5ab5a0b168f0508491eddea131e040fa33d8bed2159"
+}
