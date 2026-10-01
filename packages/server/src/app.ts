@@ -14,7 +14,12 @@ export interface BuildAppOptions {
 
 export async function buildApp(options: BuildAppOptions = {}) {
   const app = Fastify({ logger: true });
-  await app.register(cors, { origin: ["http://localhost:5173"] });
+  // Vite picks the next free port when 5173 is taken (5174, 5175, ...), so
+  // pinning to one origin breaks the whole app with an opaque CORS failure
+  // the moment a stray dev server is already running on 5173. This is a
+  // local hackathon tool, not a deployed service — any localhost/127.0.0.1
+  // origin is safe to allow.
+  await app.register(cors, { origin: /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/ });
 
   registerErrorHandler(app);
 
