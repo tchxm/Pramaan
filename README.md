@@ -28,7 +28,7 @@ tamper-evident evidence pack.
 | **Technology stack** | See [Technology stack](#technology-stack) |
 | **Working demo** | In progress — will be added to this repository |
 | **2-minute demo video** | [Finished local MP4](deliverables/PRAMAAN_DrCode_2min_demo.mp4); upload URL pending |
-| **5-slide pitch deck** | To be added |
+| **5-slide pitch deck** | [View pitch deck (PDF)](deliverables/PRAMAAN_5_Slide_Pitch_Deck.pdf) |
 
 ## Why
 

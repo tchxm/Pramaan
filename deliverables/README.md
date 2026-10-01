@@ -1,5 +1,7 @@
 # PRAMAAN finished demo
 
+[5-slide pitch deck (PDF)](PRAMAAN_5_Slide_Pitch_Deck.pdf)
+
 [Play / download the MP4](PRAMAAN_DrCode_2min_demo.mp4) · [Caption file](PRAMAAN_DrCode_2min_demo.srt)
 
 120 seconds · 1920×1080 · 30 fps · H.264 · AAC 48 kHz stereo. Synthetic Indian-English narration, burned captions, and an original procedural instrumental score.
