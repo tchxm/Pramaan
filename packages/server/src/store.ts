@@ -188,11 +188,12 @@ export class AuditStore {
     this.records.set(auditId, record);
     await this.persistState(record);
 
-    await this.appendTrace(auditId, {
-      type: "audit.started",
-      actor: "engine",
-      payload: { source, options },
-    });
+    // Not a trace event: runAudit() itself emits the canonical, spec-shaped
+    // "audit.started" (auditId/projectRoot/mode) once it actually begins —
+    // emitting a second one here with a different payload shape ({source,
+    // options}) duplicated the same TraceType with two different meanings,
+    // showing "audit started" twice in the UI's trace timeline. source/
+    // options are already persisted on the record itself (state.json).
 
     // Fire-and-forget: run the audit in the background. A7 integrates
     // against the runAudit(options, io) black box; until A6 lands this

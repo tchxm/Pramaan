@@ -26,7 +26,7 @@ export function registerFixturesRoute(app: FastifyInstance): void {
     let dirNames: string[] = [];
     try {
       dirNames = (await readdir(fixturesRoot, { withFileTypes: true }))
-        .filter((e) => e.isDirectory() && e.name !== "variants")
+        .filter((e) => e.isDirectory() && e.name !== "variants" && !e.name.startsWith("."))
         .map((e) => e.name)
         .sort();
     } catch {

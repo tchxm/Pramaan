@@ -186,6 +186,16 @@ export default function S2Workspace(): JSX.Element {
   const phaseFailed =
     audit?.status === "error" || audit?.status === "completed_with_failures" || selectedVerify?.verdict === "FAILED";
 
+  // Must run unconditionally on every render (even the loading-state early
+  // return below) — a hook called only on SOME renders breaks React's
+  // hooks-order invariant and crashes the component the moment `audit`
+  // first becomes truthy.
+  const warningsCount = useMemo(() => {
+    const scanEvent = events.find((e) => e.type === "scan.completed");
+    const warnings = scanEvent?.payload.warnings;
+    return typeof warnings === "number" ? warnings : 0;
+  }, [events]);
+
   // ---------- loading / empty states ----------
   if (!audit && !errorBanner) {
     return (
@@ -204,11 +214,6 @@ export default function S2Workspace(): JSX.Element {
   }
 
   const showEmptyState = audit && findings.length === 0 && audit.status !== "running";
-  const warningsCount = useMemo(() => {
-    const scanEvent = events.find((e) => e.type === "scan.completed");
-    const warnings = scanEvent?.payload.warnings;
-    return typeof warnings === "number" ? warnings : 0;
-  }, [events]);
 
   const centerPane = (
     <div className="scr-center-pane">
