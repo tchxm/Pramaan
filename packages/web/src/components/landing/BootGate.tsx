@@ -19,6 +19,8 @@ const BOOT_LINES = [
 export default function BootGate() {
   const [open, setOpen] = useState(true);
   const [closing, setClosing] = useState(false);
+  const [entering, setEntering] = useState(false);
+  const [flash, setFlash] = useState(false);
   const [lines, setLines] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -50,9 +52,18 @@ export default function BootGate() {
   }, [ready]);
 
   function dismiss() {
-    if (closing) return;
-    setClosing(true);
-    window.setTimeout(() => setOpen(false), 420);
+    if (entering || closing) return;
+    // Robot-to-globe handoff: dolly the robot's camera through its visor,
+    // flash at the peak, then wipe the gate away — HeroGlobe is already
+    // rendering underneath, so the flash is what sells the cut as one
+    // continuous push rather than two unrelated 3D scenes swapping places.
+    setEntering(true);
+    window.setTimeout(() => setFlash(true), 560);
+    window.setTimeout(() => {
+      setClosing(true);
+      setFlash(false);
+    }, 700);
+    window.setTimeout(() => setOpen(false), 1120);
   }
 
   useEffect(() => {
@@ -66,13 +77,13 @@ export default function BootGate() {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, closing]);
+  }, [open, closing, entering]);
 
   if (!open) return null;
 
   return (
     <div
-      className={`lp-gate${closing ? " lp-gate--closing" : ""}`}
+      className={`lp-gate${closing ? " lp-gate--closing" : ""}${entering ? " lp-gate--entering" : ""}`}
       role="dialog"
       aria-modal="true"
       aria-label="Enter PRAMAAN"
@@ -82,18 +93,19 @@ export default function BootGate() {
       <div className="lp-gate__word" aria-hidden="true">
         Evidence
       </div>
-      <BootRobot />
+      <BootRobot entering={entering} />
       <div className="lp-gate__log" role="status" aria-live="polite">
         {lines.map((line) => (
           <div key={line}>{line}</div>
         ))}
       </div>
-      <button ref={buttonRef} type="button" className="lp-gate__start" onClick={dismiss} disabled={!ready}>
+      <button ref={buttonRef} type="button" className="lp-gate__start" onClick={dismiss} disabled={!ready || entering}>
         {ready ? "Enter" : "Booting…"}
       </button>
-      <button type="button" className="lp-gate__skip" onClick={dismiss}>
+      <button type="button" className="lp-gate__skip" onClick={dismiss} disabled={entering}>
         Skip
       </button>
+      <div className={`lp-gate__flash${flash ? " lp-gate__flash--peak" : ""}`} aria-hidden="true" />
     </div>
   );
 }

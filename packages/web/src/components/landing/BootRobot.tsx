@@ -11,8 +11,10 @@ import * as THREE from "three";
  * attempt would look worse than no character at all. This is scoped to be
  * small, reliable, and still give the gate real character presence.
  */
-export default function BootRobot() {
+export default function BootRobot({ entering = false }: { entering?: boolean }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const enteringRef = useRef(entering);
+  enteringRef.current = entering;
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -128,11 +130,24 @@ export default function BootRobot() {
     let t = 0;
     function tick() {
       t += 0.016;
-      const targetY = reducedMotion ? 0 : pointer.x * 0.5;
-      const targetX = reducedMotion ? 0 : -pointer.y * 0.22;
+      const isEntering = enteringRef.current;
+      const targetY = reducedMotion || isEntering ? 0 : pointer.x * 0.5;
+      const targetX = reducedMotion || isEntering ? 0 : -pointer.y * 0.22;
       headGroup.rotation.y += (targetY - headGroup.rotation.y) * 0.06;
       headGroup.rotation.x += (targetX - headGroup.rotation.x) * 0.06;
-      headGroup.position.y = reducedMotion ? 0 : Math.sin(t * 1.1) * 0.06;
+      headGroup.position.y = reducedMotion || isEntering ? headGroup.position.y * 0.9 : Math.sin(t * 1.1) * 0.06;
+
+      // "Enter" dollies the camera straight through the robot's visor —
+      // this is the camera half of the robot-to-globe handoff: BootGate
+      // flashes white at the dolly's peak, then unmounts this scene and
+      // reveals HeroGlobe already rendering behind it, so the cut reads as
+      // one continuous push rather than a hard swap between two scenes.
+      const targetZ = isEntering ? 1.22 : 5.2;
+      const targetFov = isEntering ? 62 : 32;
+      camera.position.z += (targetZ - camera.position.z) * (isEntering ? 0.12 : 0.06);
+      camera.fov += (targetFov - camera.fov) * (isEntering ? 0.12 : 0.06);
+      camera.updateProjectionMatrix();
+      trim.emissiveIntensity = isEntering ? Math.min(2.2, trim.emissiveIntensity + 0.08) : 0.4;
 
       if (!reducedMotion) {
         if (t > blinkAt) {

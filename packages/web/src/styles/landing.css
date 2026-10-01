@@ -315,6 +315,43 @@
   pointer-events: none;
 }
 
+.lp-gate--entering .lp-gate__chrome,
+.lp-gate--entering .lp-gate__word,
+.lp-gate--entering .lp-gate__log,
+.lp-gate--entering .lp-gate__start,
+.lp-gate--entering .lp-gate__skip {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.lp-gate__flash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(ellipse at 50% 40%, #eef6f2 0%, #9ff7dd 38%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease-out;
+}
+
+.lp-gate__flash--peak {
+  opacity: 1;
+  transition: opacity 0.12s ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-gate--entering .lp-gate__chrome,
+  .lp-gate--entering .lp-gate__word,
+  .lp-gate--entering .lp-gate__log,
+  .lp-gate--entering .lp-gate__start,
+  .lp-gate--entering .lp-gate__skip,
+  .lp-gate__flash,
+  .lp-gate__flash--peak {
+    transition: none;
+  }
+}
+
 .lp-gate__chrome {
   position: absolute;
   font-family: var(--ws-mono, "JetBrains Mono", monospace);
